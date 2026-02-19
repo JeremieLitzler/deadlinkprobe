@@ -10,6 +10,12 @@ All sub agents must retry `MAX_RETRIES` at most before notifying human.
 
 ## Pipeline
 
+### Step 0 — Branching
+
+Read `prompts/agent-4-git.md` and spawn a subagent using the Task tool with that prompt, instructing it to perform **Task 1 and Task 2 only** (pull latest main and create the branch). Do not ask it to commit or push yet.
+
+Wait for the branch to be created before proceeding.
+
 ### Step 1 — Specs
 
 Read `prompts/agent-1-specs.md` and spawn a subagent using the Task tool with that prompt as the task description. The subagent will read `.agents/user-requests.md` and write `.agents/specs.md`.
@@ -41,6 +47,8 @@ Read `prompts/agent-3-tester.md` and spawn a subagent using the Task tool with t
 
 Wait for `.agents/test-results.md` to end with either `status: passed` or `status: failed`.
 
+If the tester agent does not produce a result (no status line written), treat it as `status: failed` and count it toward MAX_RETRIES.
+
 If `status: failed`:
 
 - Show the user the test failure summary from `.agents/test-results.md`.
@@ -51,6 +59,6 @@ If MAX_RETRIES is exceeded at any step, stop the pipeline and report the failure
 
 ### Step 4 — Versioning
 
-Read `prompts/agent-4-git.md` and spawn a subagent using the Task tool with that prompt.
+Read `prompts/agent-4-git.md` and spawn a subagent using the Task tool with that prompt, instructing it to perform **Task 3 only** (commit and push the work on the branch created in Step 0).
 
 Report the branch name and commit message to the user when done.
