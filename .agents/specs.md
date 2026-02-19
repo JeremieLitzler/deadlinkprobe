@@ -298,4 +298,29 @@ Note: the start URL itself (`https://deadlinkchecker-sample-website.netlify.app/
 5. Fragment stripping: Prevents `page#section1` and `page#section2` from being treated as separate URLs.
 6. Empty-string referrer for start URL: Provides a consistent sentinel that sorts before all other referrers in the output.
 
+## Change Requests
+
+### CR-2: Split `tests/test_checker.py` into per-module test files
+
+**Motivation:** A single monolithic test file mixes concerns from six modules plus integration. Splitting into one file per source module and one integration file improves isolation, discoverability, and parallel test execution.
+
+**File deleted:** `tests/test_checker.py`
+
+**Files created:**
+
+| New file | Contains (class names from the original file) |
+|---|---|
+| `tests/test_normaliser.py` | `TestNormalise` |
+| `tests/test_parser.py` | `TestExtractLinks` |
+| `tests/test_fetcher.py` | `TestCheckUrl` |
+| `tests/test_reporter.py` | `TestWriteCsv` |
+| `tests/test_checker_cli.py` | `TestCheckerCLI` |
+| `tests/test_integration.py` | `TestIntegration` |
+
+Each new file must:
+- Include the `PROJECT_ROOT` / `sys.path` bootstrap block identical to the original.
+- Import only the module(s) it tests.
+- End with the `if __name__ == "__main__": unittest.main(verbosity=2)` guard.
+
+
 status: ready
