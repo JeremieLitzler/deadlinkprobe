@@ -14,3 +14,5 @@ Then, check all links to gather HTTP status code.
 The output is a CSV for the run with the link itself, the referrer link, the HTTP status code.
 
 Try to run the logic with parallel requests.
+
+This sample website provides all the links to test the script: `https://deadlinkchecker-sample-website.netlify.app`.
