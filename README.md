@@ -18,30 +18,47 @@ A CLI tool to detect broken links on any website. Given a starting URL, it crawl
 
 Results are written to a CSV file with the following columns:
 
-| Column             | Description                               |
-|--------------------|-------------------------------------------|
-| `link`             | The URL that was checked                  |
-| `referrer`         | The page that contained the link          |
-| `http_status_code` | HTTP response code (e.g. 200, 404, 500)  |
+| Column             | Description                             |
+| ------------------ | --------------------------------------- |
+| `link`             | The URL that was checked                |
+| `referrer`         | The page that contained the link        |
+| `http_status_code` | HTTP response code (e.g. 200, 404, 500) |
 
 ## Testing
 
 A sample website is available to test the tool against:
 
-```
+```plaintext
 https://deadlinkchecker-sample-website.netlify.app
 ```
+
+The expected output is (sorted by referrer, then link):
+
+```csv
+link,referrer,http_status_code
+https://deadlinkchecker-sample-website.netlify.app/about/,https://deadlinkchecker-sample-website.netlify.app/,404
+https://deadlinkchecker-sample-website.netlify.app/blog,https://deadlinkchecker-sample-website.netlify.app/,200
+https://deadlinkchecker-sample-website.netlify.app/contact,https://deadlinkchecker-sample-website.netlify.app/,200
+https://iamjeremie.me/,https://deadlinkchecker-sample-website.netlify.app/contact,200
+https://iamjeremie.me/doesnt-exist,https://deadlinkchecker-sample-website.netlify.app/contact,404
+```
+
+Notes:
+
+- `/about/` is an intentional dead link (404) on the sample site.
+- `https://iamjeremie.me/` and `https://iamjeremie.me/doesnt-exist` are external links, checked but not crawled.
+- Links to `/` discovered from `/contact` and `/blog` are skipped as already visited.
 
 ## Development
 
 This project uses a multi-agent pipeline powered by Claude Code. Describe a feature request or bug fix and the orchestrator coordinates specialist agents automatically.
 
-| Agent         | Role                                          |
-|---------------|-----------------------------------------------|
-| Specification | Writes detailed specs from the user request   |
-| Coder         | Implements the feature based on specs         |
-| Tester        | Validates the implementation with tests       |
-| Versioning    | Commits to a Git Flow branch and pushes       |
+| Agent         | Role                                        |
+| ------------- | ------------------------------------------- |
+| Specification | Writes detailed specs from the user request |
+| Coder         | Implements the feature based on specs       |
+| Tester        | Validates the implementation with tests     |
+| Versioning    | Commits to a Git Flow branch and pushes     |
 
 Human approval gates pause the pipeline after specs and after coding.
 
@@ -59,7 +76,7 @@ Human approval gates pause the pipeline after specs and after coding.
 ### Branch naming
 
 | Change type | Branch prefix |
-|-------------|---------------|
+| ----------- | ------------- |
 | New feature | `feature/`    |
 | Bug fix     | `fix/`        |
 | Docs only   | `docs/`       |
