@@ -21,3 +21,5 @@ status: ready
 ```
 
 Listen to `.agents/code-ready.md` file to look for `status: review specs` in the last line and process feedback following `### Specifications Need Review`.
+
+Do NOT use horizontal rules (`---`) anywhere in the output file.

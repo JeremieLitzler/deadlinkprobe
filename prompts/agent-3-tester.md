@@ -9,6 +9,8 @@ Write and run tests that cover:
 - Edge cases mentioned in the spec
 - Any error/failure conditions
 
+When running tests, use python with `/e/Applications/Scoop/apps/python/current/python.exe`.
+
 Write a full test report to .agents/test-results.md including:
 
 - Which tests were run
