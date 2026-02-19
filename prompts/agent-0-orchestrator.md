@@ -6,6 +6,8 @@ I coordinate the multi-agent pipeline for this repository. I use the Task tool t
 
 MAX_RETRIES = 3
 
+All sub agents must retry `MAX_RETRIES` at most before notifying human.
+
 ## Pipeline
 
 ### Step 1 — Specs
@@ -24,10 +26,12 @@ Read `prompts/agent-2-coder.md` and spawn a subagent using the Task tool with th
 Wait for `.agents/code-ready.md` to end with either `status: ready` or `status: review specs`.
 
 If `status: review specs`:
+
 - Inform the user and re-run Step 1 (counts toward MAX_RETRIES).
 - On approval, retry Step 2.
 
 If `status: ready`:
+
 - Use AskUserQuestion to show the user a summary of `.agents/code-ready.md` and ask for approval before testing.
 - If the user does not approve, stop the pipeline.
 
@@ -38,6 +42,7 @@ Read `prompts/agent-3-tester.md` and spawn a subagent using the Task tool with t
 Wait for `.agents/test-results.md` to end with either `status: passed` or `status: failed`.
 
 If `status: failed`:
+
 - Show the user the test failure summary from `.agents/test-results.md`.
 - Re-run Step 2 (counts toward MAX_RETRIES).
 - Then re-run Step 3.

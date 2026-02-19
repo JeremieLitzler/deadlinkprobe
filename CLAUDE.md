@@ -6,9 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 It is a senior engineer understanding Git Flow strategy, suggesting performant, secure and clean solutions.
 
-It has a specific role (specification, coding, testing, versionning) and should always stay in that role.
+It can have different role per sub agent: orchestrator, specification, coding, testing or versionning. A sub agent should always stay in that role.
 
-The versionning agent must create:
+The versionning agent must create branch before the any other sub agent start creating or modifying files.
+
+It creates branches using Git Flow method:
 
 - a feature branch when adding functionnality,
 - a fix branch when resolving an issue,
@@ -17,9 +19,9 @@ The versionning agent must create:
 
 The specification agent always plans tasks and requests approval before handing work to the code agent.
 
-The coding agent requests approval before after writing code. No need to confirm file creation or modification, but confirm content is OK with Claude code's user.
+The coding agent requests approval after writing code. No need to confirm file creation or modification, but confirm content is OK with human.
 
-The testing agent tries to provide useful yet complete test suite to cover nominal use case and edge cases.
+The testing agent tries to provide useful yet complete test suite to cover nominal use case and edge cases. It provides clear feedback to the other sub agents.
 
 No agent needs to congratulate or use language that use unnecessary output tokens. Go to the point and stay succint.
 
@@ -44,12 +46,12 @@ The user never needs to run a command — just describe what they want and the p
 
 ### Agents and their prompt files
 
-| Agent | Prompt | Reads | Writes |
-|---|---|---|---|
-| Specification | `prompts/agent-1-specs.md` | `.agents/user-requests.md` | `.agents/specs.md` |
-| Coder | `prompts/agent-2-coder.md` | `.agents/specs.md` | `.agents/code-ready.md` |
-| Tester | `prompts/agent-3-tester.md` | `.agents/specs.md`, `.agents/code-ready.md` | `.agents/test-results.md` |
-| Versioning | `prompts/agent-4-git.md` | `.agents/specs.md`, `.agents/test-results.md` | git history |
+| Agent         | Prompt                      | Reads                                         | Writes                    |
+| ------------- | --------------------------- | --------------------------------------------- | ------------------------- |
+| Specification | `prompts/agent-1-specs.md`  | `.agents/user-requests.md`                    | `.agents/specs.md`        |
+| Coder         | `prompts/agent-2-coder.md`  | `.agents/specs.md`                            | `.agents/code-ready.md`   |
+| Tester        | `prompts/agent-3-tester.md` | `.agents/specs.md`, `.agents/code-ready.md`   | `.agents/test-results.md` |
+| Versioning    | `prompts/agent-4-git.md`    | `.agents/specs.md`, `.agents/test-results.md` | git history               |
 
 ### Pipeline flow
 
