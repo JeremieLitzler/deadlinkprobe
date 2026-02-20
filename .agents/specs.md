@@ -322,5 +322,57 @@ Each new file must:
 - Import only the module(s) it tests.
 - End with the `if __name__ == "__main__": unittest.main(verbosity=2)` guard.
 
+### CR-3: Add terminal feedback during execution
+
+**Motivation:** The tool currently produces no output while it runs, making it appear hung on large sites. Live progress output lets users see activity as URLs are discovered and checked.
+
+**Scope:** Two distinct events must be printed to stdout during execution:
+
+1. **URL discovered** — emitted by `crawler.crawl()` each time a new URL is added to `results` (both internal and external).
+2. **URL checked** — emitted by `checker.py` each time a `check_url` future completes.
+
+**Files to modify:**
+
+| File | Change |
+|---|---|
+| `crawler.py` | Print each discovered URL immediately after it is appended to `results`. |
+| `checker.py` | Print each URL and its resolved status immediately after a future completes. |
+
+**Exact output formats:**
+
+Discovered (in `crawler.py`, inside the `crawl` function, after `results.append(...)`):
+
+```
+DISCOVERED <url>
+```
+
+Checked (in `checker.py`, inside the `as_completed` loop, after `future.result()` is obtained):
+
+```
+CHECKED <url> <status>
+```
+
+Where `<status>` is either the HTTP status code string (e.g. `200`, `404`) or the `ERROR:<ExceptionClassName>` string — identical to what is written to CSV.
+
+**Print target:** `sys.stdout` using the built-in `print()` function with no additional formatting. Each line is terminated by the default newline.
+
+**Thread safety:** The `CHECKED` prints occur inside `concurrent.futures.as_completed`, where multiple threads may complete near-simultaneously. Python's `print()` is not guaranteed to be atomic across threads. The implementation must wrap each `print()` call in the `as_completed` loop with a `threading.Lock` to prevent interleaved output. The lock instance is created once in `main()` and passed down, or defined at module scope.
+
+**Parallelism note:** `DISCOVERED` prints happen in the single-threaded crawl phase and require no locking. `CHECKED` prints happen in the parallel status-check phase and must be serialised with a lock.
+
+**Signature changes:**
+
+`crawler.crawl` signature is unchanged: `crawl(start_url: str, timeout: int, user_agent: str) -> list[tuple[str, str]]`. The `print` call is added inline; no new parameter is introduced.
+
+`checker.py` `main()` adds a `threading.Lock` instance and uses it to guard each `print` in the `as_completed` loop.
+
+**Edge cases and error handling:**
+
+- If `crawler.crawl` returns an empty list (start URL normalisation fails), no `DISCOVERED` line is printed.
+- If `check_url` raises an unhandled exception (it should not — it catches all exceptions internally), the `CHECKED` print is skipped for that URL; the existing `future.result()` call propagates the exception naturally.
+- The `DISCOVERED` line for the start URL itself is printed exactly once, before any pages are fetched.
+- No change to the final summary line: `Checked {n} links. Results written to {output_path}.` — it remains at the end.
+
+**No changes to:** `fetcher.py`, `normaliser.py`, `parser.py`, `reporter.py`, any test files.
 
 status: ready

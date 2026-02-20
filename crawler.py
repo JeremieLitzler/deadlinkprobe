@@ -22,6 +22,7 @@ def crawl(start_url: str, timeout: int, user_agent: str) -> list[tuple[str, str]
     queue: deque[str] = deque([normalised_start])
     visited: set[str] = {normalised_start}
     results: list[tuple[str, str]] = [(normalised_start, "")]
+    print(f"DISCOVERED {normalised_start}")
 
     while queue:
         current_url = queue.popleft()
@@ -38,6 +39,7 @@ def crawl(start_url: str, timeout: int, user_agent: str) -> list[tuple[str, str]
                 continue
             visited.add(norm)
             results.append((norm, current_url))
+            print(f"DISCOVERED {norm}")
             if is_internal(norm, start_url):
                 queue.append(norm)
 

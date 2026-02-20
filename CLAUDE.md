@@ -26,7 +26,7 @@ Tests also work with the standard library runner: `python -m unittest tests/test
 
 The tool is a pipeline of five modules driven by `checker.py`:
 
-```
+```plaintext
 checker.py  →  crawler.py  →  fetcher.py    (fetch_html, per-page GET)
                            →  normaliser.py (resolve + strip fragments)
                            →  parser.py     (extract <a href> values)
