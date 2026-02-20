@@ -15,7 +15,7 @@ A CLI tool to detect broken links on any website. Given a starting URL, it crawl
 No external dependencies — requires Python 3.10+ only.
 
 ```bash
-python checker.py <start_url> [options]
+python src/checker.py <start_url> [options]
 ```
 
 | Option | Default | Description |
@@ -29,7 +29,7 @@ python checker.py <start_url> [options]
 **Example:**
 
 ```bash
-python checker.py https://example.com --output report.csv --workers 20
+python src/checker.py https://example.com --output report.csv --workers 20
 ```
 
 ## Output Format
