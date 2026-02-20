@@ -10,4 +10,9 @@
 - Created `tests/test_integration.py` — contains `TestIntegration`
 - Deleted `tests/test_checker.py`
 
+## CR-3: Add terminal feedback during execution
+
+- Modified `crawler.py` — added `print(f"DISCOVERED {url}")` immediately after each URL is appended to `results` (start URL and all subsequently discovered URLs).
+- Modified `checker.py` — imported `threading`, created `print_lock = threading.Lock()` in `main()`, and added a lock-guarded `print(f"CHECKED {link} {status}")` after each future completes in the `as_completed` loop.
+
 status: ready

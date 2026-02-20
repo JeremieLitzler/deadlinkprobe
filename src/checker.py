@@ -3,6 +3,7 @@
 import argparse
 import concurrent.futures
 import sys
+import threading
 import urllib.parse
 
 import crawler
@@ -59,6 +60,7 @@ def main() -> None:
     link_pairs = crawler.crawl(args.start_url, args.timeout, args.user_agent)
 
     results: list[tuple[str, str, str]] = []
+    print_lock = threading.Lock()
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as executor:
         future_to_pair = {
@@ -69,6 +71,8 @@ def main() -> None:
             link, referrer = future_to_pair[future]
             status = future.result()
             results.append((link, referrer, status))
+            with print_lock:
+                print(f"CHECKED {link} {status}")
 
     results.sort(key=lambda row: (row[1], row[0]))
 

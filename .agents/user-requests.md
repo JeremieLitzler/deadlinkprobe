@@ -15,3 +15,10 @@ Language: Python 3. Prefer stdlib only (urllib, concurrent.futures, html.parser)
 ## 2026-02-19 — Change request
 
 - Split test file into several file, one per code file and one for the integration tests.
+
+## 2026-02-20 — Feature request
+
+Add terminal feedback during execution:
+
+- Each time a URL is **discovered** (found by the crawler): print the URL.
+- Each time a URL is **checked** (HTTP status resolved): print the URL and its status code or ERROR string.

@@ -8,7 +8,7 @@ No dependencies beyond the Python standard library. No install step needed.
 
 ```bash
 # Run the checker
-python checker.py <start_url> [--output results.csv] [--workers 10] [--timeout 10] [--user-agent deadlinkchecker/1.0]
+python src/checker.py <start_url> [--output results.csv] [--workers 10] [--timeout 10] [--user-agent deadlinkchecker/1.0]
 
 # Run all tests
 python -m pytest tests/
@@ -26,7 +26,7 @@ Tests also work with the standard library runner: `python -m unittest tests/test
 
 The tool is a pipeline of five modules driven by `checker.py`:
 
-```
+```plaintext
 checker.py  →  crawler.py  →  fetcher.py    (fetch_html, per-page GET)
                            →  normaliser.py (resolve + strip fragments)
                            →  parser.py     (extract <a href> values)
