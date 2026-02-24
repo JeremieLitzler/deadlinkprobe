@@ -5,7 +5,8 @@
       "Bash(/e/Applications/Scoop/apps/python/current/python.exe -m unittest:*)",
       "Bash(gh issue:*)",
       "Bash(git:*)",
-      "Bash(gh pr:*)"
+      "Bash(gh pr:*)",
+      "Bash(gh api:*)"
     ]
   }
 }
