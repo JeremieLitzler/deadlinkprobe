@@ -9,10 +9,21 @@ Take the request to understand the feature or change being requested and write t
 The specifications must include:
 
 - Goal and scope of the change
-- Files to create or modify
-- Key functions/types/interfaces with their signatures
-- Edge cases and error handling expectations
-- Any parallelism or concurrency considerations
+- Files to create or modify, and what each file's role is (without prescribing internal structure)
+- Edge cases described as user-visible or externally observable consequences
+- Concurrency or performance requirements stated as qualities of the outcome (e.g. "results must be written only after all checks complete") not as implementation blueprints
+
+A good spec describes WHAT the system does: goals, rules, constraints, and observable outcomes. It does not describe HOW the system does it.
+
+Use the Example Mapping method from the Agile community to write specifications.
+
+Do NOT include any of the following in a spec:
+
+- Function signatures, method names, or parameter lists
+- Pseudocode or code snippets
+- Exact variable names or field names
+- Import lists or module-level implementation details
+- Any other content that belongs in implementation rather than specification
 
 ## Writing to `.agents-output/specs.md`
 

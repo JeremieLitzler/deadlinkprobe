@@ -28,4 +28,15 @@
 
 - Modified `.github/workflows/deadlinkchecker.yml` — replaced bare checkout with a `data/scans`-branch checkout (`ref: data/scans`, `fetch-depth: 0`), added an "Ensure data/scans branch exists" step that creates the branch locally if the remote does not yet have it, and changed `git push` to `git push origin data/scans` so scan results are committed to the `data/scans` branch instead of `main`, bypassing the `protect-main` ruleset.
 
+## 2026-02-24 - Issue #18: Agentic Workflow updates
+
+- Modified `.agents-brain/agent-1-specs.md` — removed the "Key functions/types/interfaces with their signatures" bullet and replaced it with guidance directing the specs agent to describe WHAT the system does (goals, rules, observable outcomes) and explicitly prohibiting implementation-level content (function signatures, pseudocode, variable names, code snippets, import lists).
+- Modified `.agents-brain/agent-2-coder.md` — added a "Technical Choice Explanations" section requiring the coder agent to document the reason behind each non-trivial implementation decision in `code-ready.md`; added an "Object Calisthenics" section enumerating all nine rules inline with two concrete before/after examples (the no-else rule and the one-level-of-indentation rule).
+
+### Technical choices
+
+The nine Object Calisthenics rules were enumerated directly inside the agent prompt rather than referenced by URL so the agent can apply them without fetching external content. Two code examples were embedded inline to give the agent concrete patterns to follow, as abstract rules alone are insufficient guidance for consistent application. The "no-else" and "one-level-of-indentation" rules were chosen for illustration because they are the most frequently violated and their before/after contrast is immediately legible.
+
+The `agent-1-specs.md` change uses an explicit prohibition list (function signatures, pseudocode, variable names, code snippets, import lists) rather than a general statement like "avoid implementation details", because general statements have proven insufficient — the current specs already demonstrate that the agent defaults to including those artefacts when not explicitly forbidden.
+
 status: ready
