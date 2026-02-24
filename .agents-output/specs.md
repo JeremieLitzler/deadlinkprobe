@@ -641,4 +641,86 @@ jobs:
         run: python -m pytest tests/ -v
 ```
 
+## 2026-02-24 - Bug #16: Workflow link checker cannot push scans folder
+
+### Goal and Scope
+
+The `deadlinkchecker.yml` GitHub Actions workflow commits scan CSV results and pushes them directly to `main`. A `protect-main` branch ruleset (ruleset id 13171940) now enforces that all writes to the default branch must go through a pull request. The `github-actions[bot]` is not a bypass actor, so the `git push` step fails with a ruleset violation.
+
+The fix is to redirect the push to a dedicated data branch (`data/scans`) that is not the default branch and therefore not subject to the `protect-main` ruleset.
+
+Scope is limited to a single file: `.github/workflows/deadlinkchecker.yml`. No source code, tests, or other workflow files require changes.
+
+### File to Modify
+
+`.github/workflows/deadlinkchecker.yml`
+
+### Exact Changes Required
+
+The workflow must be restructured so that:
+
+1. The repository is checked out on the `data/scans` branch (not `main`).
+2. Scan results are committed to that branch.
+3. The push targets `data/scans`, not `main`.
+
+#### Step 1 — Checkout step
+
+Replace the bare `uses: actions/checkout@v4` with a checkout that fetches the `data/scans` branch if it exists:
+
+```yaml
+- name: Checkout data/scans branch
+  uses: actions/checkout@v4
+  with:
+    ref: data/scans
+    fetch-depth: 0
+```
+
+`fetch-depth: 0` is required so the full history is available and the push will not be rejected as a non-fast-forward on subsequent runs.
+
+Because `data/scans` may not exist on the first run, add a shell step immediately after to create the branch if needed:
+
+```yaml
+- name: Ensure data/scans branch exists
+  run: |
+    git fetch origin data/scans || true
+    git checkout data/scans 2>/dev/null || git checkout -b data/scans
+```
+
+`|| true` prevents the step from failing when the remote branch does not yet exist. On the first run it falls through to `git checkout -b data/scans`.
+
+#### Step 2 — Run link checker step
+
+No change to the run commands. The `scans/` folder is written relative to the working directory, which is now on the `data/scans` branch.
+
+#### Step 3 — Commit results step
+
+Replace the existing commit/push step with:
+
+```yaml
+- name: Commit and push results
+  run: |
+    git config user.name "github-actions[bot]"
+    git config user.email "github-actions[bot]@users.noreply.github.com"
+    git add scans/
+    git diff --cached --quiet || git commit -m "bot: add scan for $(date +%Y-%m-%d)"
+    git push origin data/scans
+```
+
+Key change: `git push` becomes `git push origin data/scans` (explicit remote and branch). On first run this creates the branch on the remote.
+
+### Edge Cases
+
+| Scenario | Behaviour |
+|---|---|
+| First run — `data/scans` does not exist on remote | `git fetch origin data/scans` returns non-zero; `\|\| true` suppresses the error. `git checkout -b data/scans` creates the branch locally. `git push origin data/scans` creates it on the remote. |
+| Subsequent runs | `git fetch origin data/scans` succeeds. `git checkout data/scans` switches to the fetched branch. Push is a normal fast-forward. |
+| No new scan results (empty diff) | `git diff --cached --quiet` exits 0 and the commit is skipped. `git push origin data/scans` is a no-op and exits 0. |
+| Concurrent workflow runs | The second push will be rejected as non-fast-forward. Job fails and must be re-run. Acceptable limitation for a nightly job. |
+
+### No Changes To
+
+- Any `src/` files
+- Any test files
+- `.github/workflows/ci.yml`
+
 status: ready
