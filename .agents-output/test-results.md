@@ -240,3 +240,93 @@ tests/test_reporter.py::TestWriteMarkdownSummary::test_table_header_row_present 
 8 new tests added for Issue #8 in `TestWriteMarkdownSummary`. All 36 pre-existing tests continue to pass with no regressions.
 
 status: passed
+
+## 2026-02-24 - Bug #16: Workflow link checker cannot push scans folder
+
+### Environment
+
+- Python: `/e/Applications/Scoop/apps/python/current/python.exe` (3.14.3)
+- Command: `python -m pytest tests/ -v`
+- Working directory: `E:/Git/GitHub/deadlinkchecker`
+- Date: 2026-02-24
+- File under review: `.github/workflows/deadlinkchecker.yml`
+
+### Static Checks Against Spec
+
+| # | Requirement | Result | Notes |
+|---|---|---|---|
+| 1 | Checkout step does NOT specify `ref: data/scans` (must check out default branch first so it never fails on first run) | PASS | The `actions/checkout@v4` step has no `ref:` key; it checks out the default branch. |
+| 2 | Checkout step has `fetch-depth: 0` | PASS | `fetch-depth: 0` is present under the checkout `with:` block. |
+| 3 | "Ensure data/scans branch exists" step comes AFTER the checkout step | PASS | Checkout is the first step; "Ensure data/scans branch exists" is the second step — order is correct. |
+| 4 | That step runs `git fetch origin data/scans \|\| true` to avoid failure when branch does not exist | PASS | `git fetch origin data/scans \|\| true` is present exactly as specified. |
+| 5 | That step runs `git checkout data/scans 2>/dev/null \|\| git checkout -b data/scans` | PASS | `git checkout data/scans 2>/dev/null \|\| git checkout -b data/scans` is present exactly as specified. |
+| 6 | Commit/push step uses `git push origin data/scans` (not bare `git push`) | PASS | `git push origin data/scans` — explicit remote and branch are named. |
+| 7 | `git diff --cached --quiet \|\| git commit` guard is still present (no commit if nothing changed) | PASS | `git diff --cached --quiet \|\| git commit -m "bot: add scan for $(date +%Y-%m-%d)"` is present. |
+| 8 | No changes to any `src/` files or test files | PASS | Only `.github/workflows/deadlinkchecker.yml` was modified; no `src/` or `tests/` files were touched. |
+
+All 8 static checks pass.
+
+### Python Test Suite (Regression Check)
+
+No Python source files changed; the test suite is run to confirm no regressions from any prior change on this branch.
+
+```
+============================= test session starts =============================
+platform win32 -- Python 3.14.3, pytest-9.0.2, pluggy-1.6.0
+rootdir: E:\Git\GitHub\deadlinkchecker
+collected 44 items
+
+tests/test_checker_cli.py::TestCheckerCLI::test_help_exits_zero PASSED
+tests/test_checker_cli.py::TestCheckerCLI::test_invalid_url_scheme_exits_nonzero PASSED
+tests/test_checker_cli.py::TestCheckerCLI::test_no_args_exits_nonzero PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_discovered_count_matches_results PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_discovered_printed_for_each_found_link PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_discovered_printed_for_start_url PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_duplicate_links_not_discovered_twice PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_no_discovered_when_start_url_invalid PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_checked_line_format_with_error_status PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_checked_line_format_with_status_code PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_checked_line_printed_for_each_link PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_no_checked_lines_when_no_links PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_summary_line_present_after_checked_lines PASSED
+tests/test_checker_cli.py::TestCheckerThreadSafety::test_checked_lines_are_not_interleaved PASSED
+tests/test_fetcher.py::TestCheckUrl::test_retries_get_on_405 PASSED
+tests/test_fetcher.py::TestCheckUrl::test_returns_200_on_success PASSED
+tests/test_fetcher.py::TestCheckUrl::test_returns_301_on_redirect PASSED
+tests/test_fetcher.py::TestCheckUrl::test_returns_error_on_url_error PASSED
+tests/test_integration.py::TestIntegration::test_about_page_is_404 PASSED
+tests/test_integration.py::TestIntegration::test_contains_200_status PASSED
+tests/test_integration.py::TestIntegration::test_contains_404_status PASSED
+tests/test_integration.py::TestIntegration::test_csv_has_correct_header PASSED
+tests/test_integration.py::TestIntegration::test_exit_code_is_zero PASSED
+tests/test_normaliser.py::TestNormalise::test_is_internal_different_host PASSED
+tests/test_normaliser.py::TestNormalise::test_is_internal_same_host PASSED
+tests/test_normaliser.py::TestNormalise::test_resolves_protocol_relative_href PASSED
+tests/test_normaliser.py::TestNormalise::test_resolves_relative_path_href PASSED
+tests/test_normaliser.py::TestNormalise::test_resolves_root_relative_href PASSED
+tests/test_normaliser.py::TestNormalise::test_returns_none_for_javascript PASSED
+tests/test_normaliser.py::TestNormalise::test_returns_none_for_mailto PASSED
+tests/test_normaliser.py::TestNormalise::test_strips_fragment_from_absolute_url PASSED
+tests/test_parser.py::TestExtractLinks::test_empty_html_returns_empty_list PASSED
+tests/test_parser.py::TestExtractLinks::test_ignores_non_anchor_tags PASSED
+tests/test_parser.py::TestExtractLinks::test_returns_hrefs_from_anchor_tags PASSED
+tests/test_parser.py::TestExtractLinks::test_skips_empty_href_values PASSED
+tests/test_reporter.py::TestWriteCsv::test_writes_header_and_rows PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_200_rows_do_not_appear_in_table_body PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_all_200_results_produce_empty_table_body PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_empty_results_writes_heading_and_empty_table PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_file_is_created PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_first_non_empty_line_is_heading PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_non_200_rows_appear_in_table_body PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_oserror_on_unwritable_path_causes_systemexit_1 PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_table_header_row_present PASSED
+
+============================== 44 passed in 1.86s ==============================
+```
+
+### Test Summary
+
+44 tests run across 6 files. 44 passed, 0 failed, 0 errors. No regressions.
+8 static workflow checks performed. 8 passed, 0 failed.
+
+status: passed
