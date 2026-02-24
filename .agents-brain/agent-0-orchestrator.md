@@ -22,10 +22,10 @@ Read `.agents-brain/agent-1-specs.md` and spawn a subagent using the Task tool w
 
 Wait for `.agents-output/specs.md` to end with `status: ready`.
 
-Read `.agents-brain/agent-4-git.md` and spawn a subagent using the Task tool with that prompt, instructing it to perform **Task 3 only** (commit specs output).
-
-Use AskUserQuestion to show the user a summary of `.agents-output/specs.md` and ask for approval before proceeding to coding.
+Use AskUserQuestion to show the user a summary of `.agents-output/specs.md` and ask for approval before proceeding to commit changes.
 If the user does not approve, stop the pipeline and report why.
+
+Read `.agents-brain/agent-4-git.md` and spawn a subagent using the Task tool with that prompt, instructing it to perform **Task 3 only** (commit specs output). Then proceed to coding.
 
 ### Step 2 — Coding
 
@@ -40,9 +40,9 @@ If `status: review specs`:
 
 If `status: ready`:
 
-- Read `.agents-brain/agent-4-git.md` and spawn a subagent using the Task tool with that prompt, instructing it to perform **Task 4 only** (commit code changes).
 - Use AskUserQuestion to show the user a summary of `.agents-output/code-ready.md` and ask for approval before testing.
-- If the user does not approve, stop the pipeline.
+  - If the user does not approve, stop the pipeline.
+- Read `.agents-brain/agent-4-git.md` and spawn a subagent using the Task tool with that prompt, instructing it to perform **Task 4 only** (commit code changes).
 
 ### Step 3 — Testing
 
