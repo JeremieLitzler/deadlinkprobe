@@ -35,3 +35,11 @@ Also, scans must be stored in the folder `scans/[WEBSITE]` and should contains a
 ## 2026-02-24 — Issue #14: Add a CI step to run tests on PRs
 
 Add a GitHub Actions workflow that automatically runs the test suite when a pull request is created or updated against any branch.
+
+## 2026-02-24 — Bug #16: Workflow link checker cannot push scans folder
+
+A `protect-main` ruleset was added to the repository requiring all changes to `main` to go through a PR. The `deadlinkchecker.yml` workflow does a direct `git push` to `main` after committing scan results, which is now blocked by this ruleset.
+
+Root cause: the `protect-main` ruleset enforces a `pull_request` rule on `~DEFAULT_BRANCH`. The `github-actions[bot]` is not in the bypass actors list. The workflow at `.github/workflows/deadlinkchecker.yml` runs `git push` directly to `main` after committing scan CSVs to `scans/`.
+
+Expected fix: the workflow should push scan results to a dedicated branch (e.g., `data/scans`) that is not covered by the `protect-main` ruleset, instead of pushing directly to `main`.
