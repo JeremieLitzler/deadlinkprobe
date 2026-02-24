@@ -4,7 +4,8 @@
       "WebFetch(domain:deadlinkchecker-sample-website.netlify.app)",
       "Bash(/e/Applications/Scoop/apps/python/current/python.exe -m unittest:*)",
       "Bash(gh issue:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(gh pr:*)"
     ]
   }
 }
