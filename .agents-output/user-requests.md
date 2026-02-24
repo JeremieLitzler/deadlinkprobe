@@ -43,3 +43,10 @@ A `protect-main` ruleset was added to the repository requiring all changes to `m
 Root cause: the `protect-main` ruleset enforces a `pull_request` rule on `~DEFAULT_BRANCH`. The `github-actions[bot]` is not in the bypass actors list. The workflow at `.github/workflows/deadlinkchecker.yml` runs `git push` directly to `main` after committing scan CSVs to `scans/`.
 
 Expected fix: the workflow should push scan results to a dedicated branch (e.g., `data/scans`) that is not covered by the `protect-main` ruleset, instead of pushing directly to `main`.
+
+## 2026-02-24 — Issue #18: Agentic Workflow updates
+
+- Make the specs agent suggest less code and let the coding agent figure it out. The specs are too technical and should stick to the business logic.
+- Make the coding agent:
+  - Explain its technical choices.
+  - Follow code style rules like Object Calisthenics (https://dev.to/muzammilnm/understanding-object-calisthenics-writing-cleaner-code-maj).

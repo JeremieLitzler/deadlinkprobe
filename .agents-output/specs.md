@@ -710,17 +710,59 @@ Key change: `git push` becomes `git push origin data/scans` (explicit remote and
 
 ### Edge Cases
 
-| Scenario | Behaviour |
-|---|---|
+| Scenario                                          | Behaviour                                                                                                                                                                                         |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | First run — `data/scans` does not exist on remote | `git fetch origin data/scans` returns non-zero; `\|\| true` suppresses the error. `git checkout -b data/scans` creates the branch locally. `git push origin data/scans` creates it on the remote. |
-| Subsequent runs | `git fetch origin data/scans` succeeds. `git checkout data/scans` switches to the fetched branch. Push is a normal fast-forward. |
-| No new scan results (empty diff) | `git diff --cached --quiet` exits 0 and the commit is skipped. `git push origin data/scans` is a no-op and exits 0. |
-| Concurrent workflow runs | The second push will be rejected as non-fast-forward. Job fails and must be re-run. Acceptable limitation for a nightly job. |
+| Subsequent runs                                   | `git fetch origin data/scans` succeeds. `git checkout data/scans` switches to the fetched branch. Push is a normal fast-forward.                                                                  |
+| No new scan results (empty diff)                  | `git diff --cached --quiet` exits 0 and the commit is skipped. `git push origin data/scans` is a no-op and exits 0.                                                                               |
+| Concurrent workflow runs                          | The second push will be rejected as non-fast-forward. Job fails and must be re-run. Acceptable limitation for a nightly job.                                                                      |
 
 ### No Changes To
 
 - Any `src/` files
 - Any test files
 - `.github/workflows/ci.yml`
+
+## 2026-02-24 - Issue #18: Agentic Workflow updates
+
+### Goal and Scope
+
+The agentic pipeline currently produces specifications that are too close to implementation instructions. The specs agent prescribes function signatures, pseudocode, exact import lists, and code snippets, leaving little room for the coding agent to exercise engineering judgement. The goal is to shift the specs agent toward describing business behaviour and observable outcomes, and to give the coding agent two new responsibilities: transparency about its technical decisions and adherence to Object Calisthenics coding discipline.
+
+This change affects only the two agent prompt files. No source code or test files are modified.
+
+### Files to Modify
+
+- `.agents-brain/agent-1-specs.md`
+- `.agents-brain/agent-2-coder.md`
+
+### Behavioural Changes Required
+
+#### `.agents-brain/agent-1-specs.md`
+
+The specs agent must stop producing implementation-level content. The current prompt includes "Key functions/types/interfaces with their signatures" as a required spec element. This must be removed or replaced with guidance that directs the specs agent toward business behaviour only.
+
+The updated prompt must make clear that a good spec describes:
+
+- What the system must do (goals, rules, constraints, observable outcomes)
+- Which files are affected and what their roles are, without prescribing internal structure
+- Edge cases in terms of user-visible or externally observable consequences, not in terms of code paths
+- Concurrency or performance requirements as qualities of the outcome, not as implementation blueprints
+
+The prompt must explicitly discourage including function signatures, pseudocode, exact variable names, code snippets, import lists, or any other content that belongs in implementation rather than specification.
+
+#### `.agents-brain/agent-2-coder.md`
+
+The coding agent must be given two additional responsibilities recorded in its `code-ready.md` output:
+
+**Technical choice explanations:** For each non-trivial implementation decision (choosing one algorithm or data structure over another, choosing to add a helper vs inline logic, choosing a specific error handling approach), the coder agent must write a short explanation of why that choice was made. This explanation lives in the `code-ready.md` section alongside the file summary.
+
+**Object Calisthenics compliance:** The coder agent must follow the nine Object Calisthenics rules when writing code: one level of indentation per method, no use of the `else` keyword, wrap all primitives and strings in domain types, use first-class collections, one dot per line, no abbreviations in names, keep all entities small, no class may have more than two instance variables, and no getters or setters. The prompt must enumerate all nine rules inline so the agent can apply them without fetching an external URL.
+
+Include in the agent's brain at least one example from the source article that it can use as guidelines.
+
+### Constraints
+
+These changes must not alter the pipeline flow, the format of other output files, or the responsibilities of any other agent. The versioning agent, tester agent, and orchestrator are unaffected.
 
 status: ready
