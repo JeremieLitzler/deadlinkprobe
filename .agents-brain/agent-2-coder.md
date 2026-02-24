@@ -9,15 +9,23 @@ When implementation is complete:
 - Write a summary of every file created or changed to `.agents-output/code-ready.md`, including a one-line description of each change.
 - Do not include test files in the summary (the test-agent handles those).
 
-End `.agents-output/code-ready.md` with the line:
+## Writing to `.agents-output/code-ready.md`
+
+The file accumulates entries across tasks. Do not overwrite previous content.
+
+- If the file does not exist, create it with the first line `# Output of Agent Coder`, then a blank line.
+- Append a new `## YYYY-MM-DD - [Short description of feature or Issue id with a #]` section (today's date) with the summary beneath it.
+- End the new section with the line:
 
 ```plaintext
 status: ready
 ```
 
+The `status: ready` line must always be the last line of the file.
+
 Listen to tester agent feedback in `.agents-output/test-results.md`.
 If the last line is `status: failed`, read the feedback following `### Testing failed`.
-If you find an incoherence in the specifications causing tests to fail, end `.agents-output/code-ready.md` with the line:
+If you find an incoherence in the specifications causing tests to fail, end the current section of `.agents-output/code-ready.md` with:
 
 ```plaintext
 ### Specifications Need Review

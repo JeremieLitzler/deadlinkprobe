@@ -48,13 +48,13 @@ The tool is invoked directly. No `setup.py` or `pip install` is required at this
 
 ### Arguments
 
-| Argument | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `start_url` | positional str | Yes | — | The URL to begin crawling from. |
-| `--output` / `-o` | str | No | `results.csv` | Path to the output CSV file. |
-| `--workers` / `-w` | int | No | `10` | Number of threads in the ThreadPoolExecutor. |
-| `--timeout` / `-t` | int | No | `10` | Per-request timeout in seconds. |
-| `--user-agent` | str | No | `deadlinkchecker/1.0` | User-Agent header sent with every request. |
+| Argument           | Type           | Required | Default               | Description                                  |
+| ------------------ | -------------- | -------- | --------------------- | -------------------------------------------- |
+| `start_url`        | positional str | Yes      | —                     | The URL to begin crawling from.              |
+| `--output` / `-o`  | str            | No       | `results.csv`         | Path to the output CSV file.                 |
+| `--workers` / `-w` | int            | No       | `10`                  | Number of threads in the ThreadPoolExecutor. |
+| `--timeout` / `-t` | int            | No       | `10`                  | Per-request timeout in seconds.              |
+| `--user-agent`     | str            | No       | `deadlinkchecker/1.0` | User-Agent header sent with every request.   |
 
 ### Example
 
@@ -106,9 +106,11 @@ Extracts all href values from `<a>` tags in an HTML document.
 Subclass of `html.parser.HTMLParser`.
 
 Attributes:
+
 - `links: list[str]` — accumulated raw href values.
 
 Method `handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None`:
+
 - If `tag == 'a'`, iterate over `attrs`.
 - For each `(name, value)` pair where `name == 'href'` and `value` is not `None` and not empty string, append `value` to `self.links`.
 
@@ -194,6 +196,7 @@ while queue is not empty:
 ```
 
 Notes:
+
 - `visited` tracks both internal and external URLs to prevent the same external link from appearing more than once in results even if linked from multiple pages.
 - The `start_url` itself is normalised before being placed into `visited` and `results`.
 - BFS order ensures pages closer to the root are crawled before deeper pages.
@@ -205,10 +208,12 @@ Writes the final CSV output.
 #### `write_csv(results: list[tuple[str, str, str]], output_path: str) -> None`
 
 Parameters:
+
 - `results`: list of `(link, referrer, http_status_code)` tuples, already sorted.
 - `output_path`: file path for the output CSV.
 
 Behaviour:
+
 - Opens `output_path` in write mode with `newline=''` and `encoding='utf-8'`.
 - Uses `csv.writer` with default dialect.
 - Writes header row: `link,referrer,http_status_code`.
@@ -237,30 +242,30 @@ Thread safety note: `crawler.crawl` runs single-threaded (BFS). Parallelism appl
 
 ## URL Normalisation — Detailed Rules
 
-| Input | Base | Result |
-|---|---|---|
-| `https://example.com/page#section` | any | `https://example.com/page` |
-| `/about` | `https://example.com/home` | `https://example.com/about` |
-| `//cdn.example.com/x.js` | `https://example.com/` | `https://cdn.example.com/x.js` |
-| `../other` | `https://example.com/a/b/` | `https://example.com/a/other` |
-| `mailto:x@y.com` | any | `None` (filtered) |
-| `javascript:void(0)` | any | `None` (filtered) |
-| `tel:+123` | any | `None` (filtered) |
-| `https://example.com/page?q=1` | any | `https://example.com/page?q=1` (query preserved) |
+| Input                              | Base                       | Result                                           |
+| ---------------------------------- | -------------------------- | ------------------------------------------------ |
+| `https://example.com/page#section` | any                        | `https://example.com/page`                       |
+| `/about`                           | `https://example.com/home` | `https://example.com/about`                      |
+| `//cdn.example.com/x.js`           | `https://example.com/`     | `https://cdn.example.com/x.js`                   |
+| `../other`                         | `https://example.com/a/b/` | `https://example.com/a/other`                    |
+| `mailto:x@y.com`                   | any                        | `None` (filtered)                                |
+| `javascript:void(0)`               | any                        | `None` (filtered)                                |
+| `tel:+123`                         | any                        | `None` (filtered)                                |
+| `https://example.com/page?q=1`     | any                        | `https://example.com/page?q=1` (query preserved) |
 
 ## Error Handling
 
-| Scenario | Behaviour |
-|---|---|
-| `start_url` not http/https | Print error to stderr, exit code 1 |
-| `fetch_html` network failure during crawl | Return `None`; skip page silently |
-| `check_url` network failure | Record `ERROR:<ExceptionClassName>` as status |
-| `check_url` HTTP 3xx | Record the 3xx status code as-is (no follow) |
-| `check_url` HTTP 405 on HEAD | Retry with GET; record result of GET |
-| HTML parse failure | Return empty link list; log nothing |
-| Output file not writable | Print error to stderr, exit code 1 |
-| Worker count < 1 | Validate `>= 1` manually, exit code 1 if invalid |
-| Timeout < 1 | Validate `>= 1` manually, exit code 1 if invalid |
+| Scenario                                  | Behaviour                                        |
+| ----------------------------------------- | ------------------------------------------------ |
+| `start_url` not http/https                | Print error to stderr, exit code 1               |
+| `fetch_html` network failure during crawl | Return `None`; skip page silently                |
+| `check_url` network failure               | Record `ERROR:<ExceptionClassName>` as status    |
+| `check_url` HTTP 3xx                      | Record the 3xx status code as-is (no follow)     |
+| `check_url` HTTP 405 on HEAD              | Retry with GET; record result of GET             |
+| HTML parse failure                        | Return empty link list; log nothing              |
+| Output file not writable                  | Print error to stderr, exit code 1               |
+| Worker count < 1                          | Validate `>= 1` manually, exit code 1 if invalid |
+| Timeout < 1                               | Validate `>= 1` manually, exit code 1 if invalid |
 
 ## Edge Cases
 
@@ -308,16 +313,17 @@ Note: the start URL itself (`https://deadlinkchecker-sample-website.netlify.app/
 
 **Files created:**
 
-| New file | Contains (class names from the original file) |
-|---|---|
-| `tests/test_normaliser.py` | `TestNormalise` |
-| `tests/test_parser.py` | `TestExtractLinks` |
-| `tests/test_fetcher.py` | `TestCheckUrl` |
-| `tests/test_reporter.py` | `TestWriteCsv` |
-| `tests/test_checker_cli.py` | `TestCheckerCLI` |
-| `tests/test_integration.py` | `TestIntegration` |
+| New file                    | Contains (class names from the original file) |
+| --------------------------- | --------------------------------------------- |
+| `tests/test_normaliser.py`  | `TestNormalise`                               |
+| `tests/test_parser.py`      | `TestExtractLinks`                            |
+| `tests/test_fetcher.py`     | `TestCheckUrl`                                |
+| `tests/test_reporter.py`    | `TestWriteCsv`                                |
+| `tests/test_checker_cli.py` | `TestCheckerCLI`                              |
+| `tests/test_integration.py` | `TestIntegration`                             |
 
 Each new file must:
+
 - Include the `PROJECT_ROOT` / `sys.path` bootstrap block identical to the original.
 - Import only the module(s) it tests.
 - End with the `if __name__ == "__main__": unittest.main(verbosity=2)` guard.
@@ -333,9 +339,9 @@ Each new file must:
 
 **Files to modify:**
 
-| File | Change |
-|---|---|
-| `crawler.py` | Print each discovered URL immediately after it is appended to `results`. |
+| File         | Change                                                                       |
+| ------------ | ---------------------------------------------------------------------------- |
+| `crawler.py` | Print each discovered URL immediately after it is appended to `results`.     |
 | `checker.py` | Print each URL and its resolved status immediately after a future completes. |
 
 **Exact output formats:**
@@ -374,5 +380,164 @@ Where `<status>` is either the HTTP status code string (e.g. `200`, `404`) or th
 - No change to the final summary line: `Checked {n} links. Results written to {output_path}.` — it remains at the end.
 
 **No changes to:** `fetcher.py`, `normaliser.py`, `parser.py`, `reporter.py`, any test files.
+
+## 2026-02-24 - Issue #8: Add a summary for each website scanned
+
+### Goal and Scope
+
+After a scan completes, produce a structured folder containing both the full CSV results and a Markdown summary focused on non-200 responses. The folder structure organises scans by website and timestamp, making it easy to compare runs over time.
+
+This feature changes where output is written when `--output` is **not** provided. The existing `--output` flag retains the original flat CSV-only behaviour as an escape hatch.
+
+### Output Mode Decision
+
+| Invocation                                     | CSV written to                            | README.md written                       |
+| ---------------------------------------------- | ----------------------------------------- | --------------------------------------- |
+| `python src/checker.py <url>` (no `--output`)  | `scans/[WEBSITE]/[TIMESTAMP]/results.csv` | `scans/[WEBSITE]/[TIMESTAMP]/README.md` |
+| `python src/checker.py <url> --output foo.csv` | `foo.csv`                                 | not written                             |
+
+The `--output` default in `argparse` changes from `"results.csv"` to `None`. A `None` value signals the scan-folder mode; any non-`None` string signals the legacy flat-file mode.
+
+### Path Construction Rules
+
+**`[WEBSITE]`** — the `netloc` component of the start URL (scheme+host+port), with colons (`:`) replaced by underscores (`_`).
+
+Examples:
+
+- `https://example.com` → `example.com`
+- `http://localhost:8080` → `localhost_8080`
+- `https://example.com:443` → `example.com_443`
+
+**`[TIMESTAMP]`** — UTC datetime at the moment `main()` begins (before crawling), formatted as `YYYY-MM-DDTHH-MM-SS` (ISO 8601 with hyphens replacing colons for filesystem safety).
+
+Example: `2026-02-24T14-05-32`
+
+Full scan folder path example:
+
+```plaintext
+scans/example.com/2026-02-24T14-05-32/
+```
+
+The `scans/` root is always relative to the current working directory (i.e. wherever the user invokes the CLI from).
+
+### Files to Create or Modify
+
+| File              | Action | Reason                                                                            |
+| ----------------- | ------ | --------------------------------------------------------------------------------- |
+| `src/reporter.py` | Modify | Add `write_markdown_summary()` function                                           |
+| `src/checker.py`  | Modify | Change `--output` default, add scan-folder logic, call `write_markdown_summary()` |
+
+No other source files require changes.
+
+### Key Functions and Signatures
+
+#### `reporter.py` — new function `write_markdown_summary`
+
+```python
+def write_markdown_summary(
+    results: list[tuple[str, str, str]],
+    output_path: str,
+    timestamp: str,
+) -> None:
+```
+
+Parameters:
+
+- `results`: list of `(link, referrer, http_status_code)` tuples, already sorted.
+- `output_path`: full file path where the `README.md` should be written.
+- `timestamp`: the scan timestamp string as formatted in `[TIMESTAMP]` (e.g. `"2026-02-24T14-05-32"`).
+
+Behaviour:
+
+- Filter `results` to only rows where `http_status_code != "200"`.
+- Write a Markdown file to `output_path` with the following structure:
+
+```markdown
+## [TIMESTAMP]
+
+| URL | Referrer | HTTP Status |
+|---|---|---|
+| <link> | <referrer> | <http_status_code> |
+...
+```
+
+- If no non-200 results exist, still write the heading and an empty table (header row only, no data rows).
+- If the file cannot be opened (e.g. permission error, parent directory missing), print an error to `stderr` and exit with code 1.
+- Use `encoding="utf-8"`.
+
+#### `checker.py` — changes to `main()`
+
+1. Change the `--output` / `-o` argument:
+   - `default` changes from `"results.csv"` to `None`.
+   - Help text updated to reflect new behaviour.
+
+2. Capture the scan timestamp at the start of `main()`, before crawling:
+
+   ```python
+   import datetime
+   scan_timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M-%S")
+   ```
+
+3. After sorting results, determine output paths:
+
+   ```python
+   import urllib.parse, os
+
+   if args.output is not None:
+       # Legacy mode: flat CSV only
+       csv_path = args.output
+       md_path = None
+   else:
+       # Scan-folder mode
+       parsed_start = urllib.parse.urlparse(args.start_url)
+       website = parsed_start.netloc.replace(":", "_")
+       scan_dir = os.path.join("scans", website, scan_timestamp)
+       os.makedirs(scan_dir, exist_ok=True)
+       csv_path = os.path.join(scan_dir, "results.csv")
+       md_path = os.path.join(scan_dir, "README.md")
+   ```
+
+4. Call `reporter.write_csv(results, csv_path)`.
+
+5. If `md_path is not None`, call `reporter.write_markdown_summary(results, md_path, scan_timestamp)`.
+
+6. Update the final summary print to reflect the actual csv_path:
+
+   ```python
+   print(f"Checked {len(results)} links. Results written to {csv_path}.")
+   ```
+
+### Edge Cases and Error Handling
+
+| Scenario                                                               | Behaviour                                                                                                                                                                  |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--output` is provided                                                 | Scan-folder mode is skipped entirely; `README.md` is not written; behaviour is identical to before this feature.                                                           |
+| All results are 200                                                    | `README.md` is written with the heading and empty table body.                                                                                                              |
+| `scans/` directory does not exist                                      | `os.makedirs(scan_dir, exist_ok=True)` creates all necessary intermediate directories.                                                                                     |
+| `os.makedirs` fails (e.g. permission denied)                           | The `OSError` propagates and is caught in `write_csv` / `write_markdown_summary`; each prints to `stderr` and exits with code 1.                                           |
+| `netloc` contains characters invalid on the filesystem (e.g. `*`, `?`) | Only `:` is replaced with `_` as specified. Other characters are left as-is; on Windows, paths with these characters will raise an `OSError` which is caught and reported. |
+| Timestamp collision (two scans within the same second)                 | The second scan overwrites files in the same folder. This is acceptable for v1.                                                                                            |
+| Start URL has no port in netloc                                        | `netloc` contains no colon beyond the host; `replace(":", "_")` is a no-op in this case.                                                                                   |
+| `--output` value is an explicit path with missing parent directories   | `write_csv` will raise `OSError`; this is already handled (prints to stderr, exits 1).                                                                                     |
+| Non-200 status includes `ERROR:*` strings                              | These are included in the summary table alongside HTTP error codes such as 404 or 500 — any value that is not the string `"200"` appears in the summary.                   |
+
+### Imports Added
+
+`src/checker.py` requires two additional stdlib imports:
+
+- `datetime` (for `datetime.datetime.now` and `strftime`)
+- `os` (for `os.path.join` and `os.makedirs`)
+
+Both are already in the standard library; no new dependencies are introduced.
+
+`src/reporter.py` requires no new imports beyond what it already uses (`csv`, `sys`).
+
+### No Changes To
+
+- `src/crawler.py`
+- `src/fetcher.py`
+- `src/normaliser.py`
+- `src/parser.py`
+- Any existing test files
 
 status: ready

@@ -2,6 +2,8 @@
 
 import argparse
 import concurrent.futures
+import datetime
+import os
 import sys
 import threading
 import urllib.parse
@@ -18,8 +20,11 @@ def main() -> None:
     parser.add_argument("start_url", help="The URL to begin crawling from.")
     parser.add_argument(
         "--output", "-o",
-        default="results.csv",
-        help="Path to the output CSV file. (default: results.csv)",
+        default=None,
+        help=(
+            "Path to the output CSV file. When omitted, results are written to "
+            "scans/[WEBSITE]/[TIMESTAMP]/results.csv and a README.md summary is also produced."
+        ),
     )
     parser.add_argument(
         "--workers", "-w",
@@ -40,6 +45,8 @@ def main() -> None:
     )
 
     args = parser.parse_args()
+
+    scan_timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M-%S")
 
     parsed = urllib.parse.urlparse(args.start_url)
     if parsed.scheme not in ("http", "https"):
@@ -76,9 +83,24 @@ def main() -> None:
 
     results.sort(key=lambda row: (row[1], row[0]))
 
-    reporter.write_csv(results, args.output)
+    if args.output is not None:
+        # Legacy mode: flat CSV only, no README.md
+        csv_path = args.output
+        md_path = None
+    else:
+        # Scan-folder mode
+        website = parsed.netloc.replace(":", "_")
+        scan_dir = os.path.join("scans", website, scan_timestamp)
+        os.makedirs(scan_dir, exist_ok=True)
+        csv_path = os.path.join(scan_dir, "results.csv")
+        md_path = os.path.join(scan_dir, "README.md")
 
-    print(f"Checked {len(results)} links. Results written to {args.output}.")
+    reporter.write_csv(results, csv_path)
+
+    if md_path is not None:
+        reporter.write_markdown_summary(results, md_path, scan_timestamp)
+
+    print(f"Checked {len(results)} links. Results written to {csv_path}.")
 
 
 if __name__ == "__main__":

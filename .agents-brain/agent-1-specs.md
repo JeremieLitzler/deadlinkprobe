@@ -14,11 +14,19 @@ The specifications must include:
 - Edge cases and error handling expectations
 - Any parallelism or concurrency considerations
 
-End `.agents-output/specs.md` with the line:
+## Writing to `.agents-output/specs.md`
+
+The file accumulates entries across tasks. Do not overwrite previous content.
+
+- If the file does not exist, create it with the first line `# Output of Agent Specification`, then a blank line.
+- Append a new `## YYYY-MM-DD - [Short description of feature or Issue id with a #]` section (today's date) with the spec content beneath it.
+- End the new section with the line:
 
 ```plaintext
 status: ready
 ```
+
+The `status: ready` line must always be the last line of the file.
 
 Listen to `.agents-output/code-ready.md` file to look for `status: review specs` in the last line and process feedback following `### Specifications Need Review`.
 

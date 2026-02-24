@@ -22,3 +22,12 @@ Add terminal feedback during execution:
 
 - Each time a URL is **discovered** (found by the crawler): print the URL.
 - Each time a URL is **checked** (HTTP status resolved): print the URL and its status code or ERROR string.
+
+## 2026-02-24 — Issue #8: Add a summary for each website scanned
+
+After running a scan, produce a Markdown file per website containing:
+
+- A level-2 heading with the timestamp of the scan
+- A table showing URL, referrer, and HTTP status code — but **only for non-200 responses**
+
+Also, scans must be stored in the folder `scans/[WEBSITE]` and should contains a sub folder per scan with a file `README.md` with the summary and `results.csv` for the scan's result.

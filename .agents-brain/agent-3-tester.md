@@ -11,13 +11,18 @@ Write and run tests that cover:
 
 When running tests, use python with `/e/Applications/Scoop/apps/python/current/python.exe`.
 
-Write a full test report to .agents-output/test-results.md including:
+## Writing to `.agents-output/test-results.md`
 
-- Which tests were run
-- Which passed and which failed
-- Output or stack traces for any failures
+The file accumulates entries across tasks. Do not overwrite previous content.
 
-End `.agents-output/test-results.md` with either:
+- If the file does not exist, create it with the first line `# Output of Agent Tester`, then a blank line.
+- Append a new `## YYYY-MM-DD - [Short description of feature or Issue id with a #]` section (today's date).
+- Under it, write a full test report including:
+  - Which tests were run
+  - Which passed and which failed
+  - Output or stack traces for any failures
+
+End the new section with either:
 
 ```plaintext
 ### Test Summary
@@ -36,3 +41,5 @@ or:
 
 status: failed
 ```
+
+The status line must always be the last line of the file.

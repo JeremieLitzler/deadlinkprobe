@@ -128,3 +128,115 @@ OK
 11 new tests added for CR-3 (5 DISCOVERED, 5 CHECKED format, 1 thread safety).
 
 status: passed
+
+---
+
+## 2026-02-24 - Issue #8: Add a summary for each website scanned
+
+### Environment
+
+- Python: `/e/Applications/Scoop/apps/python/current/python.exe` (3.14.3)
+- Command: `python -m pytest tests/ -v`
+- Working directory: `E:/Git/GitHub/deadlinkchecker`
+- Date: 2026-02-24
+
+---
+
+### Files Modified
+
+- `tests/test_reporter.py` — added `TestWriteMarkdownSummary` class (8 new tests); existing `TestWriteCsv` class left unchanged.
+
+---
+
+### New Test Class: `TestWriteMarkdownSummary`
+
+Tests for `reporter.write_markdown_summary(results, output_path, timestamp)`.
+
+| Test | Description | Result |
+|---|---|---|
+| `test_file_is_created` | Output file exists at the given path after the call | PASS |
+| `test_first_non_empty_line_is_heading` | First non-empty line is `## <timestamp>` | PASS |
+| `test_table_header_row_present` | Content contains `| URL | Referrer | HTTP Status |` | PASS |
+| `test_non_200_rows_appear_in_table_body` | Rows with status 404, 500, ERROR:URLError are present in the table body | PASS |
+| `test_200_rows_do_not_appear_in_table_body` | Rows with status 200 are absent from the table body | PASS |
+| `test_all_200_results_produce_empty_table_body` | When every result is 200, no data rows appear after the separator | PASS |
+| `test_empty_results_writes_heading_and_empty_table` | An empty results list still produces the heading, header row and separator with no data rows | PASS |
+| `test_oserror_on_unwritable_path_causes_systemexit_1` | An unwritable path (missing parent directory) causes `SystemExit` with code 1 | PASS |
+
+---
+
+### Pre-existing Tests (unchanged, all still pass)
+
+| File | Test Class | Tests | Result |
+|---|---|---|---|
+| `tests/test_checker_cli.py` | `TestCheckerCLI` | 3 | PASS |
+| `tests/test_checker_cli.py` | `TestCrawlerDiscoveredOutput` | 5 | PASS |
+| `tests/test_checker_cli.py` | `TestCheckerCheckedOutput` | 5 | PASS |
+| `tests/test_checker_cli.py` | `TestCheckerThreadSafety` | 1 | PASS |
+| `tests/test_fetcher.py` | `TestCheckUrl` | 4 | PASS |
+| `tests/test_normaliser.py` | `TestNormalise` | 8 | PASS |
+| `tests/test_parser.py` | `TestExtractLinks` | 4 | PASS |
+| `tests/test_reporter.py` | `TestWriteCsv` | 1 | PASS |
+| `tests/test_integration.py` | `TestIntegration` | 5 | PASS |
+
+---
+
+### Full Run Output
+
+```
+tests/test_checker_cli.py::TestCheckerCLI::test_help_exits_zero PASSED
+tests/test_checker_cli.py::TestCheckerCLI::test_invalid_url_scheme_exits_nonzero PASSED
+tests/test_checker_cli.py::TestCheckerCLI::test_no_args_exits_nonzero PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_discovered_count_matches_results PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_discovered_printed_for_each_found_link PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_discovered_printed_for_start_url PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_duplicate_links_not_discovered_twice PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_no_discovered_when_start_url_invalid PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_checked_line_format_with_error_status PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_checked_line_format_with_status_code PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_checked_line_printed_for_each_link PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_no_checked_lines_when_no_links PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_summary_line_present_after_checked_lines PASSED
+tests/test_checker_cli.py::TestCheckerThreadSafety::test_checked_lines_are_not_interleaved PASSED
+tests/test_fetcher.py::TestCheckUrl::test_retries_get_on_405 PASSED
+tests/test_fetcher.py::TestCheckUrl::test_returns_200_on_success PASSED
+tests/test_fetcher.py::TestCheckUrl::test_returns_301_on_redirect PASSED
+tests/test_fetcher.py::TestCheckUrl::test_returns_error_on_url_error PASSED
+tests/test_integration.py::TestIntegration::test_about_page_is_404 PASSED
+tests/test_integration.py::TestIntegration::test_contains_200_status PASSED
+tests/test_integration.py::TestIntegration::test_contains_404_status PASSED
+tests/test_integration.py::TestIntegration::test_csv_has_correct_header PASSED
+tests/test_integration.py::TestIntegration::test_exit_code_is_zero PASSED
+tests/test_normaliser.py::TestNormalise::test_is_internal_different_host PASSED
+tests/test_normaliser.py::TestNormalise::test_is_internal_same_host PASSED
+tests/test_normaliser.py::TestNormalise::test_resolves_protocol_relative_href PASSED
+tests/test_normaliser.py::TestNormalise::test_resolves_relative_path_href PASSED
+tests/test_normaliser.py::TestNormalise::test_resolves_root_relative_href PASSED
+tests/test_normaliser.py::TestNormalise::test_returns_none_for_javascript PASSED
+tests/test_normaliser.py::TestNormalise::test_returns_none_for_mailto PASSED
+tests/test_normaliser.py::TestNormalise::test_strips_fragment_from_absolute_url PASSED
+tests/test_parser.py::TestExtractLinks::test_empty_html_returns_empty_list PASSED
+tests/test_parser.py::TestExtractLinks::test_ignores_non_anchor_tags PASSED
+tests/test_parser.py::TestExtractLinks::test_returns_hrefs_from_anchor_tags PASSED
+tests/test_parser.py::TestExtractLinks::test_skips_empty_href_values PASSED
+tests/test_reporter.py::TestWriteCsv::test_writes_header_and_rows PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_200_rows_do_not_appear_in_table_body PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_all_200_results_produce_empty_table_body PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_empty_results_writes_heading_and_empty_table PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_file_is_created PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_first_non_empty_line_is_heading PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_non_200_rows_appear_in_table_body PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_oserror_on_unwritable_path_causes_systemexit_1 PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_table_header_row_present PASSED
+
+============================== 44 passed in 3.67s ==============================
+```
+
+---
+
+### Test Summary
+
+44 tests run across 6 files. 44 passed, 0 failed, 0 errors.
+8 new tests added for Issue #8 in `TestWriteMarkdownSummary`. All 36 pre-existing tests continue to pass with no regressions.
+
+status: passed
