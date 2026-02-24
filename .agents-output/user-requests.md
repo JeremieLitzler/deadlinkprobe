@@ -31,3 +31,7 @@ After running a scan, produce a Markdown file per website containing:
 - A table showing URL, referrer, and HTTP status code — but **only for non-200 responses**
 
 Also, scans must be stored in the folder `scans/[WEBSITE]` and should contains a sub folder per scan with a file `README.md` with the summary and `results.csv` for the scan's result.
+
+## 2026-02-24 — Issue #14: Add a CI step to run tests on PRs
+
+Add a GitHub Actions workflow that automatically runs the test suite when a pull request is created or updated against any branch.

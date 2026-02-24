@@ -540,4 +540,105 @@ Both are already in the standard library; no new dependencies are introduced.
 - `src/parser.py`
 - Any existing test files
 
+## 2026-02-24 - Issue #14: Add a CI step to run tests on PRs
+
+### Goal and Scope
+
+Add a GitHub Actions workflow that automatically runs the full test suite whenever a pull request is opened or updated against `main` branch. This provides automated quality gates with no manual intervention required.
+
+Scope is limited to creating a single workflow file. No changes to source code, test files, or any other project file are required.
+
+### File to Create
+
+`.github/workflows/ci.yml`
+
+The `.github/workflows/` directory must be created if it does not already exist.
+
+### GitHub Actions Workflow Specification
+
+#### Trigger
+
+```yaml
+on:
+  pull_request:
+    branches:
+      - 'main'
+```
+
+This fires on any pull request targeting any branch, including `main`, feature branches, fix branches, and docs branches.
+
+#### Runner
+
+`ubuntu-latest`
+
+#### Python Version
+
+`3.14`
+
+This matches the project minimum documented in `README.md` ("requires Python 3.10+ only"). Using `3.14` ensures the CI validates the lowest supported version, by the project which is the most conservative and correct choice.
+
+#### Steps
+
+1. **Checkout** — uses `actions/checkout@v4` to clone the repository at the PR's head commit.
+2. **Set up Python** — uses `actions/setup-python@v5` with `python-version: '3.10'`.
+3. **Install pytest** — runs `pip install pytest`. The project has no third-party runtime dependencies, but `pytest` is not part of the standard library and must be installed explicitly. No `requirements.txt` exists; the install step is a direct `pip install pytest` command.
+4. **Run tests** — runs `python -m pytest tests/ -v`.
+
+#### No Secrets or External Services
+
+The workflow requires no repository secrets, tokens, environment variables, or external service integrations. All test execution is self-contained.
+
+### Existing Test Files
+
+The following test files exist under `tests/` and will all be discovered and executed by `python -m pytest tests/ -v`:
+
+| File                        | Module under test            |
+| --------------------------- | ---------------------------- |
+| `tests/test_normaliser.py`  | `src/normaliser.py`          |
+| `tests/test_parser.py`      | `src/parser.py`              |
+| `tests/test_fetcher.py`     | `src/fetcher.py`             |
+| `tests/test_reporter.py`    | `src/reporter.py`            |
+| `tests/test_checker_cli.py` | `src/checker.py` (CLI layer) |
+| `tests/test_integration.py` | end-to-end integration       |
+
+### Edge Cases
+
+| Scenario                                | Handling                                                                                                                                                                                      |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pytest` not installed                  | Covered by the explicit `pip install pytest` step before the test run step. Without this step the `python -m pytest` command would fail with a module-not-found error.                        |
+| Python version below 3.10               | Not applicable: the workflow pins `python-version: '3.10'` so the runner always uses exactly that version.                                                                                    |
+| Test discovery finds no tests           | `pytest` exits with code 5 (no tests collected), which GitHub Actions treats as a failure. This is acceptable: an empty test suite is a configuration error.                                  |
+| A test imports a missing module         | The failing import surfaces as a collection error in `pytest -v` output, making the failure immediately visible in the Actions log.                                                           |
+| Network access during integration tests | Integration tests that make real HTTP requests will depend on external availability. If this causes flakiness, a follow-up issue should mock those calls; that is out of scope for Issue #14. |
+
+### Workflow File Content
+
+```yaml
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Run tests
+        run: python -m pytest tests/ -v
+```
+
 status: ready
