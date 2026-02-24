@@ -101,14 +101,20 @@ The user never needs to run a command — just describe what they want and the p
 ```
 [user-requests.md]
        ↓
+Versioning agent → branch
+       ↓
   Specs agent → specs.md
+       ↓
+Versioning agent → commit specs
        ↓ ← human approval
   Coder agent → code-ready.md
        ↓           ↑ status: review specs (loops back)
+       ↓
+Versioning agent → commit code
        ↓ ← human approval
  Tester agent → test-results.md
        ↓           ↑ status: failed (loops back to coder)
-Versioning agent → branch + commit + push
+Versioning agent → commit tests + push
 ```
 
 Human approval gates pause the pipeline after specs and after coding. The orchestrator retries failed loops up to 3 times before aborting.

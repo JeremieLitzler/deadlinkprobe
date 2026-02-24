@@ -22,6 +22,8 @@ Read `.agents-brain/agent-1-specs.md` and spawn a subagent using the Task tool w
 
 Wait for `.agents-output/specs.md` to end with `status: ready`.
 
+Read `.agents-brain/agent-4-git.md` and spawn a subagent using the Task tool with that prompt, instructing it to perform **Task 3 only** (commit specs output).
+
 Use AskUserQuestion to show the user a summary of `.agents-output/specs.md` and ask for approval before proceeding to coding.
 If the user does not approve, stop the pipeline and report why.
 
@@ -38,6 +40,7 @@ If `status: review specs`:
 
 If `status: ready`:
 
+- Read `.agents-brain/agent-4-git.md` and spawn a subagent using the Task tool with that prompt, instructing it to perform **Task 4 only** (commit code changes).
 - Use AskUserQuestion to show the user a summary of `.agents-output/code-ready.md` and ask for approval before testing.
 - If the user does not approve, stop the pipeline.
 
@@ -59,6 +62,6 @@ If MAX_RETRIES is exceeded at any step, stop the pipeline and report the failure
 
 ### Step 4 — Versioning
 
-Read `.agents-brain/agent-4-git.md` and spawn a subagent using the Task tool with that prompt, instructing it to perform **Task 3 only** (commit and push the work on the branch created in Step 0).
+Read `.agents-brain/agent-4-git.md` and spawn a subagent using the Task tool with that prompt, instructing it to perform **Task 5 only** (commit test results and push the branch).
 
 Report the branch name and commit message to the user when done.
