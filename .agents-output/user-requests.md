@@ -50,3 +50,7 @@ Expected fix: the workflow should push scan results to a dedicated branch (e.g.,
 - Make the coding agent:
   - Explain its technical choices.
   - Follow code style rules like Object Calisthenics (https://dev.to/muzammilnm/understanding-object-calisthenics-writing-cleaner-code-maj).
+
+## 2026-02-24 - Issue #9: Remove scans and obsolete workflow
+
+The task is handled in a private repository that pulls this one to run multiple scans.
