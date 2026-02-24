@@ -20,4 +20,8 @@
 - Modified `src/reporter.py` — added `write_markdown_summary(results, output_path, timestamp)` that writes a Markdown table of non-200 results (heading + table always present; data rows only for non-200 entries).
 - Modified `src/checker.py` — added `datetime` and `os` imports; changed `--output` default from `"results.csv"` to `None`; captures `scan_timestamp` at start of `main()` using UTC; when `--output` is omitted builds `scans/[netloc]/[timestamp]/` with `os.makedirs`, writes `results.csv` and `README.md` inside it; when `--output` is provided uses legacy flat-file mode with no README.md; final print uses `csv_path`.
 
+## 2026-02-24 - Issue #14: Add a CI step to run tests on PRs
+
+- Created `.github/workflows/ci.yml` — GitHub Actions workflow that runs `python -m pytest tests/ -v` on every pull request targeting any branch, using `ubuntu-latest` and Python `3.10`.
+
 status: ready

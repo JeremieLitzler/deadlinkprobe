@@ -619,7 +619,7 @@ name: CI
 on:
   pull_request:
     branches:
-      - '**'
+      - 'main'
 
 jobs:
   test:
