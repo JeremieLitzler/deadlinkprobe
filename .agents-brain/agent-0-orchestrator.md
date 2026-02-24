@@ -65,3 +65,7 @@ If MAX_RETRIES is exceeded at any step, stop the pipeline and report the failure
 Read `.agents-brain/agent-4-git.md` and spawn a subagent using the Task tool with that prompt, instructing it to perform **Task 5 only** (commit test results and push the branch).
 
 Report the branch name and commit message to the user when done.
+
+### Step 5 — GitHub management (end)
+
+You can run commands to create PR and complete them BUT you must request human approval to run the merge command.
