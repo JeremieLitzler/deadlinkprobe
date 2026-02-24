@@ -82,8 +82,8 @@ A dead link checker CLI tool. Given a starting URL:
 
 **When the user provides a feature request or bug fix, act as the orchestrator:**
 
-1. Save the request to `.agents/user-requests.md`.
-2. Follow the pipeline in `prompts/agent-0-orchestrator.md` step by step.
+1. Save the request to `.agents-output/user-requests.md`.
+2. Follow the pipeline in `.agents-brain/agent-0-orchestrator.md` step by step.
 
 The user never needs to run a command — just describe what they want and the pipeline starts.
 
@@ -91,10 +91,10 @@ The user never needs to run a command — just describe what they want and the p
 
 | Agent         | Prompt                      | Reads                                         | Writes                    |
 | ------------- | --------------------------- | --------------------------------------------- | ------------------------- |
-| Specification | `prompts/agent-1-specs.md`  | `.agents/user-requests.md`                    | `.agents/specs.md`        |
-| Coder         | `prompts/agent-2-coder.md`  | `.agents/specs.md`                            | `.agents/code-ready.md`   |
-| Tester        | `prompts/agent-3-tester.md` | `.agents/specs.md`, `.agents/code-ready.md`   | `.agents/test-results.md` |
-| Versioning    | `prompts/agent-4-git.md`    | `.agents/specs.md`, `.agents/test-results.md` | git history               |
+| Specification | `.agents-brain/agent-1-specs.md`  | `.agents-output/user-requests.md`                            | `.agents-output/specs.md`        |
+| Coder         | `.agents-brain/agent-2-coder.md`  | `.agents-output/specs.md`                                    | `.agents-output/code-ready.md`   |
+| Tester        | `.agents-brain/agent-3-tester.md` | `.agents-output/specs.md`, `.agents-output/code-ready.md`   | `.agents-output/test-results.md` |
+| Versioning    | `.agents-brain/agent-4-git.md`    | `.agents-output/specs.md`, `.agents-output/test-results.md` | git history                      |
 
 ### Pipeline flow
 

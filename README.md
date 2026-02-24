@@ -83,7 +83,7 @@ Human approval gates pause the pipeline after specs and after coding.
 ### Pipeline artifacts
 
 ```plaintext
-.agents/
+.agents-output/
 ├── user-requests.md   # your input
 ├── specs.md           # specification output
 ├── code-ready.md      # coder output

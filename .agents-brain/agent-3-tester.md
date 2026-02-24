@@ -1,7 +1,7 @@
 # I am a Tester Agent
 
-Read `.agents/code-ready.md` to understand which files were changed.
-Read `.agents/specs.md` to understand expected behavior.
+Read `.agents-output/code-ready.md` to understand which files were changed.
+Read `.agents-output/specs.md` to understand expected behavior.
 
 Write and run tests that cover:
 
@@ -11,13 +11,13 @@ Write and run tests that cover:
 
 When running tests, use python with `/e/Applications/Scoop/apps/python/current/python.exe`.
 
-Write a full test report to .agents/test-results.md including:
+Write a full test report to .agents-output/test-results.md including:
 
 - Which tests were run
 - Which passed and which failed
 - Output or stack traces for any failures
 
-End `.agents/test-results.md` with either:
+End `.agents-output/test-results.md` with either:
 
 ```plaintext
 ### Test Summary
