@@ -9,27 +9,53 @@ A CLI tool to detect broken links on any website. Given a starting URL, it crawl
 - Visited URL tracking to prevent infinite loops
 - Parallel HTTP requests for performance
 - CSV output: `link, referrer, http_status_code`
+- Markdown summary of non-200 results per scan
+- Email notification via the Resend API when non-200 results are found
+
+## Installation
+
+Requires Python 3.10+.
+
+```bash
+pip install -r requirements.txt
+```
 
 ## Usage
-
-No external dependencies — requires Python 3.10+ only.
 
 ```bash
 python src/checker.py <start_url> [options]
 ```
 
-| Option            | Default               | Description                                                 |
-| ----------------- | --------------------- | ----------------------------------------------------------- |
-| `start_url`       | _(required)_          | The URL to begin crawling from (must use `http` or `https`) |
-| `--output`, `-o`  | `results.csv`         | Path to the output CSV file                                 |
-| `--workers`, `-w` | `10`                  | Number of parallel threads                                  |
-| `--timeout`, `-t` | `10`                  | Per-request timeout in seconds                              |
-| `--user-agent`    | `deadlinkchecker/1.0` | User-Agent header sent with every request                   |
+| Option            | Default                                    | Description                                                 |
+| ----------------- | ------------------------------------------ | ----------------------------------------------------------- |
+| `start_url`       | _(required)_                               | The URL to begin crawling from (must use `http` or `https`) |
+| `--output`, `-o`  | `scans/[WEBSITE]/[TIMESTAMP]/results.csv`  | Path to the output CSV file                                 |
+| `--workers`, `-w` | `10`                                       | Number of parallel threads                                  |
+| `--timeout`, `-t` | `10`                                       | Per-request timeout in seconds                              |
+| `--user-agent`    | `deadlinkchecker/1.0`                      | User-Agent header sent with every request                   |
+| `--notify-email`  | _(omitted)_                                | Recipient address for a post-scan email notification        |
+
+When `--output` is omitted, results are written to `scans/[WEBSITE]/[TIMESTAMP]/` and a `README.md` summary is produced alongside `results.csv`.
 
 **Example:**
 
 ```bash
 python src/checker.py https://example.com --output report.csv --workers 20
+```
+
+### Email notifications
+
+Pass `--notify-email` with a recipient address to receive a summary email after each scan. Three environment variables must be set:
+
+| Variable              | Description                              |
+| --------------------- | ---------------------------------------- |
+| `RESEND_API_KEY`      | API key from your Resend account         |
+| `RESEND_FROM_ADDRESS` | Verified sender address in Resend        |
+
+```bash
+export RESEND_API_KEY=re_xxx
+export RESEND_FROM_ADDRESS=scanner@yourdomain.com
+python src/checker.py https://example.com --notify-email you@example.com
 ```
 
 ## Output Format
