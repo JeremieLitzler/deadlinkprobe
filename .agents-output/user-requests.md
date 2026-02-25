@@ -54,3 +54,18 @@ Expected fix: the workflow should push scan results to a dedicated branch (e.g.,
 ## 2026-02-24 - Issue #9: Remove scans and obsolete workflow
 
 The task is handled in a private repository that pulls this one to run multiple scans.
+
+## 2026-02-24 — Issue #10: Send email notification when a scan contains non HTTP/200 status
+
+After a scan completes, if any non-200 HTTP status codes were found, send an email notification using the Resend API (`https://resend.com`).
+
+Context:
+
+- The scan workflow runs in a private repo that uses this tool.
+- 3 websites run weekly scans, 1 runs monthly — estimated 13 emails/month, well within Resend's free tier (3,000/month).
+- The Resend API key must be supplied via environment variable.
+- The notification should include the website scanned and a summary of non-200 results.
+
+## 2026-02-25 — Issue #10 follow-up: use the Resend Python SDK for email sending
+
+Replace the raw `urllib` HTTP implementation in `emailer.py` with the official `resend` Python SDK (`pip install resend`), as documented at https://resend.com/docs/send-with-python.
