@@ -135,12 +135,6 @@ Human approval gates pause the pipeline after specs and after coding.
 | Bug fix     | `fix/`        |
 | Docs only   | `docs/`       |
 
-### Manual testing
-
-```bash
-python src/checker.py https://deadlinkchecker-sample-website.netlify.app
-```
-
 ## License
 
 See [LICENSE](LICENSE).
