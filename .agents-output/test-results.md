@@ -429,3 +429,423 @@ tests/test_reporter.py::TestWriteMarkdownSummary::test_table_header_row_present 
 10 static checks performed across 2 agent prompt files. 10 passed, 0 failed.
 
 status: passed
+
+## 2026-02-25 - Issue #10: Send email notification when a scan contains non HTTP/200 status
+
+### Environment
+
+- Python: `/e/Applications/Scoop/apps/python/current/python.exe` (3.14.3)
+- Command: `python -m pytest tests/ -v`
+- Working directory: `E:/Git/GitHub/deadlinkchecker`
+- Date: 2026-02-25
+
+---
+
+### Fixes Applied Before Running Tests
+
+| File | Problem | Fix |
+|---|---|---|
+| `tests/test_parser.py` | `import parser as link_parser` failed — `parser.py` was renamed to `web_parser.py` | Changed to `import web_parser as link_parser`; updated module docstring and section comment |
+
+---
+
+### New Files Created
+
+- `tests/test_emailer.py` — 4 test classes, 23 tests covering `emailer.py`
+
+### New Tests Added to Existing Files
+
+- `tests/test_checker_cli.py` — added `TestBuildArgParser` (17 tests) covering `argument_parser.build_arg_parser()`
+
+---
+
+### New Test Classes
+
+#### `TestBuildArgParser` (`tests/test_checker_cli.py`)
+
+Tests `argument_parser.build_arg_parser()` directly by calling `parse_args()` with controlled input lists.
+
+| Test | Description | Result |
+|---|---|---|
+| `test_start_url_is_required` | Omitting `start_url` raises `SystemExit` | PASS |
+| `test_start_url_stored` | `start_url` positional is stored on the namespace | PASS |
+| `test_output_default_is_none` | `--output` defaults to `None` | PASS |
+| `test_output_long_flag` | `--output` stores the provided path | PASS |
+| `test_output_short_flag` | `-o` is an alias for `--output` | PASS |
+| `test_workers_default` | `--workers` defaults to `10` | PASS |
+| `test_workers_long_flag` | `--workers` stores the given integer | PASS |
+| `test_workers_short_flag` | `-w` is an alias for `--workers` | PASS |
+| `test_workers_is_int` | `--workers` value is stored as `int` | PASS |
+| `test_timeout_default` | `--timeout` defaults to `10` | PASS |
+| `test_timeout_long_flag` | `--timeout` stores the given integer | PASS |
+| `test_timeout_short_flag` | `-t` is an alias for `--timeout` | PASS |
+| `test_timeout_is_int` | `--timeout` value is stored as `int` | PASS |
+| `test_user_agent_default` | `--user-agent` defaults to `deadlinkchecker/1.0` | PASS |
+| `test_user_agent_custom` | `--user-agent` stores the provided string | PASS |
+| `test_notify_email_default_is_none` | `--notify-email` defaults to `None` | PASS |
+| `test_notify_email_stores_address` | `--notify-email` stores the provided address | PASS |
+
+#### `TestBuildEmailRows` (`tests/test_emailer.py`)
+
+Tests `emailer._build_email_rows()`.
+
+| Test | Description | Result |
+|---|---|---|
+| `test_returns_empty_string_for_empty_list` | Empty input returns empty string | PASS |
+| `test_single_row_contains_link_referrer_status` | Single result contains link, referrer, status in `<td>` elements | PASS |
+| `test_multiple_rows_joined_by_newline` | Multiple rows joined by newlines | PASS |
+| `test_html_special_chars_are_escaped` | `<script>` in link is escaped to `&lt;script&gt;` | PASS |
+
+#### `TestBuildEmailHtml` (`tests/test_emailer.py`)
+
+Tests `emailer._build_email_html()`.
+
+| Test | Description | Result |
+|---|---|---|
+| `test_contains_website` | Output contains website name | PASS |
+| `test_contains_timestamp` | Output contains timestamp | PASS |
+| `test_contains_total_links_count` | Output contains total links count | PASS |
+| `test_contains_non_200_count` | Output contains non-200 count | PASS |
+| `test_no_table_when_no_non_200_results` | No `<table>` when non_200_results is empty | PASS |
+| `test_table_present_when_non_200_results_exist` | `<table>` present when non_200_results is non-empty | PASS |
+| `test_table_contains_thead_and_tbody` | Table has `<thead>` and `<tbody>` | PASS |
+| `test_website_html_special_chars_escaped` | HTML chars in website name are escaped | PASS |
+
+#### `TestPostToResend` (`tests/test_emailer.py`)
+
+Tests `emailer._post_to_resend()`. All calls mock `urllib.request.urlopen`.
+
+| Test | Description | Result |
+|---|---|---|
+| `test_prints_notification_sent_on_200` | `"Notification sent."` printed to stdout on HTTP 200 | PASS |
+| `test_warns_to_stderr_on_non_200_response` | Non-200 status code emits warning to stderr | PASS |
+| `test_warns_to_stderr_on_http_error` | `HTTPError` emits warning with code to stderr | PASS |
+| `test_warns_to_stderr_on_url_error` | `URLError` emits warning with reason to stderr | PASS |
+| `test_request_uses_bearer_auth_header` | `Authorization` header is `Bearer <api_key>` | PASS |
+| `test_request_is_post_method` | HTTP method is POST | PASS |
+
+#### `TestSendEmailNotification` (`tests/test_emailer.py`)
+
+Tests `emailer.send_email_notification()`. Module-level `_RESEND_API_KEY` and `_RESEND_FROM_ADDRESS` are patched directly via `patch.object` so tests are independent of the runtime environment.
+
+| Test | Description | Result |
+|---|---|---|
+| `test_warns_and_returns_when_api_key_missing` | `_RESEND_API_KEY is None` warns about `RESEND_API_KEY`, makes no HTTP call | PASS |
+| `test_warns_and_returns_when_from_address_missing` | `_RESEND_FROM_ADDRESS is None` warns about `RESEND_FROM_ADDRESS`, makes no HTTP call | PASS |
+| `test_warns_for_api_key_not_from_address_when_both_missing` | Both env vars absent: only the first (`RESEND_API_KEY`) warning emitted (early return) | PASS |
+| `test_only_non_200_results_included_in_email` | Only non-200 rows passed to `_build_email_html`; 200 rows filtered out | PASS |
+| `test_subject_contains_website_and_count` | Subject contains website name and non-200 count | PASS |
+| `test_post_to_resend_called_with_correct_credentials` | `_post_to_resend` receives `api_key` and `from_address` from env-var constants | PASS |
+| `test_all_200_results_sends_email_with_zero_non_200_count` | All-200 results still send email; subject contains `"0"` | PASS |
+
+---
+
+### Pre-existing Tests (unchanged, all still pass)
+
+| File | Test Class | Tests | Result |
+|---|---|---|---|
+| `tests/test_checker_cli.py` | `TestCheckerCLI` | 3 | PASS |
+| `tests/test_checker_cli.py` | `TestCrawlerDiscoveredOutput` | 5 | PASS |
+| `tests/test_checker_cli.py` | `TestCheckerCheckedOutput` | 5 | PASS |
+| `tests/test_checker_cli.py` | `TestCheckerThreadSafety` | 1 | PASS |
+| `tests/test_fetcher.py` | `TestCheckUrl` | 4 | PASS |
+| `tests/test_normaliser.py` | `TestNormalise` | 8 | PASS |
+| `tests/test_parser.py` | `TestExtractLinks` | 4 | PASS |
+| `tests/test_reporter.py` | `TestWriteCsv` | 1 | PASS |
+| `tests/test_reporter.py` | `TestWriteMarkdownSummary` | 8 | PASS |
+| `tests/test_integration.py` | `TestIntegration` | 5 | PASS |
+
+---
+
+### Full Run Output
+
+```
+tests/test_checker_cli.py::TestCheckerCLI::test_help_exits_zero PASSED
+tests/test_checker_cli.py::TestCheckerCLI::test_invalid_url_scheme_exits_nonzero PASSED
+tests/test_checker_cli.py::TestCheckerCLI::test_no_args_exits_nonzero PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_discovered_count_matches_results PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_discovered_printed_for_each_found_link PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_discovered_printed_for_start_url PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_duplicate_links_not_discovered_twice PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_no_discovered_when_start_url_invalid PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_checked_line_format_with_error_status PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_checked_line_format_with_status_code PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_checked_line_printed_for_each_link PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_no_checked_lines_when_no_links PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_summary_line_present_after_checked_lines PASSED
+tests/test_checker_cli.py::TestCheckerThreadSafety::test_checked_lines_are_not_interleaved PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_notify_email_default_is_none PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_notify_email_stores_address PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_output_default_is_none PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_output_long_flag PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_output_short_flag PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_start_url_is_required PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_start_url_stored PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_timeout_default PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_timeout_is_int PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_timeout_long_flag PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_timeout_short_flag PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_user_agent_custom PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_user_agent_default PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_workers_default PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_workers_is_int PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_workers_long_flag PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_workers_short_flag PASSED
+tests/test_emailer.py::TestBuildEmailRows::test_html_special_chars_are_escaped PASSED
+tests/test_emailer.py::TestBuildEmailRows::test_multiple_rows_joined_by_newline PASSED
+tests/test_emailer.py::TestBuildEmailRows::test_returns_empty_string_for_empty_list PASSED
+tests/test_emailer.py::TestBuildEmailRows::test_single_row_contains_link_referrer_status PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_contains_non_200_count PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_contains_timestamp PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_contains_total_links_count PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_contains_website PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_no_table_when_no_non_200_results PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_table_contains_thead_and_tbody PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_table_present_when_non_200_results_exist PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_website_html_special_chars_escaped PASSED
+tests/test_emailer.py::TestPostToResend::test_prints_notification_sent_on_200 PASSED
+tests/test_emailer.py::TestPostToResend::test_request_is_post_method PASSED
+tests/test_emailer.py::TestPostToResend::test_request_uses_bearer_auth_header PASSED
+tests/test_emailer.py::TestPostToResend::test_warns_to_stderr_on_http_error PASSED
+tests/test_emailer.py::TestPostToResend::test_warns_to_stderr_on_non_200_response PASSED
+tests/test_emailer.py::TestPostToResend::test_warns_to_stderr_on_url_error PASSED
+tests/test_emailer.py::TestSendEmailNotification::test_all_200_results_sends_email_with_zero_non_200_count PASSED
+tests/test_emailer.py::TestSendEmailNotification::test_only_non_200_results_included_in_email PASSED
+tests/test_emailer.py::TestSendEmailNotification::test_post_to_resend_called_with_correct_credentials PASSED
+tests/test_emailer.py::TestSendEmailNotification::test_subject_contains_website_and_count PASSED
+tests/test_emailer.py::TestSendEmailNotification::test_warns_and_returns_when_api_key_missing PASSED
+tests/test_emailer.py::TestSendEmailNotification::test_warns_and_returns_when_from_address_missing PASSED
+tests/test_emailer.py::TestSendEmailNotification::test_warns_for_api_key_not_from_address_when_both_missing PASSED
+tests/test_fetcher.py::TestCheckUrl::test_retries_get_on_405 PASSED
+tests/test_fetcher.py::TestCheckUrl::test_returns_200_on_success PASSED
+tests/test_fetcher.py::TestCheckUrl::test_returns_301_on_redirect PASSED
+tests/test_fetcher.py::TestCheckUrl::test_returns_error_on_url_error PASSED
+tests/test_integration.py::TestIntegration::test_about_page_is_404 PASSED
+tests/test_integration.py::TestIntegration::test_contains_200_status PASSED
+tests/test_integration.py::TestIntegration::test_contains_404_status PASSED
+tests/test_integration.py::TestIntegration::test_csv_has_correct_header PASSED
+tests/test_integration.py::TestIntegration::test_exit_code_is_zero PASSED
+tests/test_normaliser.py::TestNormalise::test_is_internal_different_host PASSED
+tests/test_normaliser.py::TestNormalise::test_is_internal_same_host PASSED
+tests/test_normaliser.py::TestNormalise::test_resolves_protocol_relative_href PASSED
+tests/test_normaliser.py::TestNormalise::test_resolves_relative_path_href PASSED
+tests/test_normaliser.py::TestNormalise::test_resolves_root_relative_href PASSED
+tests/test_normaliser.py::TestNormalise::test_returns_none_for_javascript PASSED
+tests/test_normaliser.py::TestNormalise::test_returns_none_for_mailto PASSED
+tests/test_normaliser.py::TestNormalise::test_strips_fragment_from_absolute_url PASSED
+tests/test_parser.py::TestExtractLinks::test_empty_html_returns_empty_list PASSED
+tests/test_parser.py::TestExtractLinks::test_ignores_non_anchor_tags PASSED
+tests/test_parser.py::TestExtractLinks::test_returns_hrefs_from_anchor_tags PASSED
+tests/test_parser.py::TestExtractLinks::test_skips_empty_href_values PASSED
+tests/test_reporter.py::TestWriteCsv::test_writes_header_and_rows PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_200_rows_do_not_appear_in_table_body PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_all_200_results_produce_empty_table_body PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_empty_results_writes_heading_and_empty_table PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_file_is_created PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_first_non_empty_line_is_heading PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_non_200_rows_appear_in_table_body PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_oserror_on_unwritable_path_causes_systemexit_1 PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_table_header_row_present PASSED
+
+============================== 86 passed in 2.76s ==============================
+```
+
+---
+
+### Test Summary
+
+86 tests run across 7 files. 86 passed, 0 failed, 0 errors.
+1 broken import fixed (`test_parser.py`: `parser` → `web_parser`).
+17 new tests added in `TestBuildArgParser` for `argument_parser.build_arg_parser()`.
+23 new tests added in `tests/test_emailer.py` covering `_build_email_rows`, `_build_email_html`, `_post_to_resend`, and `send_email_notification` (including both missing-env-var warning paths).
+
+status: passed
+
+## 2026-02-25 - Issue #10 follow-up: use the Resend Python SDK
+
+### Environment
+
+- Python: `/e/Applications/Scoop/apps/python/current/python.exe` (3.14.3)
+- Command: `python -m pytest tests/ -v`
+- Working directory: `E:/Git/GitHub/deadlinkchecker`
+- Date: 2026-02-25
+
+---
+
+### Setup
+
+- Installed `resend` package via `pip install resend` (version 2.23.0).
+
+---
+
+### Files Modified
+
+- `tests/test_emailer.py` — rewrote `TestPostToResend` and updated `TestSendEmailNotification` to match the SDK-based implementation.
+
+---
+
+### Changes to `tests/test_emailer.py`
+
+#### `TestPostToResend` → renamed `TestSendViaResend`
+
+The class was renamed to match the renamed function `_send_via_resend`. All six urllib-based tests were replaced with four SDK-based tests. The old tests mocked `emailer.urllib.request.urlopen` and called `_post_to_resend` with five arguments (including `api_key`). The new tests mock `resend.Emails.send` and call `_send_via_resend` with four arguments (no `api_key`).
+
+Tests removed (urllib concerns no longer applicable):
+- `test_warns_to_stderr_on_non_200_response` — SDK abstracts HTTP status; not separately observable.
+- `test_warns_to_stderr_on_http_error` — SDK-specific exception, not `urllib.error.HTTPError`.
+- `test_warns_to_stderr_on_url_error` — SDK-specific exception, not `urllib.error.URLError`.
+- `test_request_uses_bearer_auth_header` — SDK sets the Authorization header internally.
+- `test_request_is_post_method` — SDK method selection is internal.
+
+Tests added (SDK contract):
+
+| Test | Description | Result |
+|---|---|---|
+| `test_prints_notification_sent_on_success` | `"Notification sent."` printed to stdout when SDK call succeeds | PASS |
+| `test_warns_to_stderr_on_exception` | Any `Exception` from the SDK emits `"Warning"` and the message to stderr | PASS |
+| `test_sdk_called_with_correct_params` | `resend.Emails.send` receives a dict with `from`, `to`, `subject`, and `html` keys matching the call arguments | PASS |
+| `test_exception_does_not_propagate` | An `Exception` from the SDK is caught; the function returns normally (exits 0 guarantee) | PASS |
+
+#### `TestSendEmailNotification` — updated
+
+| Change | Old | New |
+|---|---|---|
+| "no SDK call made" assertion | `patch("emailer.urllib.request.urlopen")` + `assert_not_called()` | `patch("resend.Emails.send")` + `assert_not_called()` |
+| delegate call mock | `patch("emailer._post_to_resend")` | `patch("emailer._send_via_resend")` |
+| renamed test | `test_post_to_resend_called_with_correct_credentials` | `test_send_via_resend_called_with_correct_args` |
+| removed assertion | checked `api_key` arg passed to `_post_to_resend` | removed — `api_key` no longer passed; set via `resend.api_key` |
+| new test | — | `test_resend_api_key_set_before_send` — verifies `resend.api_key` is assigned the value of `_RESEND_API_KEY` before `_send_via_resend` is called |
+
+| Test | Description | Result |
+|---|---|---|
+| `test_warns_and_returns_when_api_key_missing` | `_RESEND_API_KEY is None` → warning, no SDK call | PASS |
+| `test_warns_and_returns_when_from_address_missing` | `_RESEND_FROM_ADDRESS is None` → warning, no SDK call | PASS |
+| `test_warns_for_api_key_not_from_address_when_both_missing` | Both absent → only `RESEND_API_KEY` warning emitted (early return) | PASS |
+| `test_only_non_200_results_included_in_email` | 200 rows filtered; only non-200 rows reach `_build_email_html` | PASS |
+| `test_subject_contains_website_and_count` | Subject contains website and non-200 count | PASS |
+| `test_send_via_resend_called_with_correct_args` | `_send_via_resend` receives correct `from_address` and `notify_email` | PASS |
+| `test_resend_api_key_set_before_send` | `resend.api_key` equals `_RESEND_API_KEY` at the moment `_send_via_resend` is entered | PASS |
+| `test_all_200_results_sends_email_with_zero_non_200_count` | All-200 input still sends; subject contains `"0"` | PASS |
+
+---
+
+### Pre-existing Tests (unchanged, all still pass)
+
+| File | Test Class | Tests | Result |
+|---|---|---|---|
+| `tests/test_checker_cli.py` | `TestCheckerCLI` | 3 | PASS |
+| `tests/test_checker_cli.py` | `TestCrawlerDiscoveredOutput` | 5 | PASS |
+| `tests/test_checker_cli.py` | `TestCheckerCheckedOutput` | 5 | PASS |
+| `tests/test_checker_cli.py` | `TestCheckerThreadSafety` | 1 | PASS |
+| `tests/test_checker_cli.py` | `TestBuildArgParser` | 17 | PASS |
+| `tests/test_emailer.py` | `TestBuildEmailRows` | 4 | PASS |
+| `tests/test_emailer.py` | `TestBuildEmailHtml` | 8 | PASS |
+| `tests/test_fetcher.py` | `TestCheckUrl` | 4 | PASS |
+| `tests/test_normaliser.py` | `TestNormalise` | 8 | PASS |
+| `tests/test_parser.py` | `TestExtractLinks` | 4 | PASS |
+| `tests/test_reporter.py` | `TestWriteCsv` | 1 | PASS |
+| `tests/test_reporter.py` | `TestWriteMarkdownSummary` | 8 | PASS |
+| `tests/test_integration.py` | `TestIntegration` | 5 | PASS |
+
+---
+
+### Full Run Output
+
+```
+tests/test_checker_cli.py::TestCheckerCLI::test_help_exits_zero PASSED
+tests/test_checker_cli.py::TestCheckerCLI::test_invalid_url_scheme_exits_nonzero PASSED
+tests/test_checker_cli.py::TestCheckerCLI::test_no_args_exits_nonzero PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_discovered_count_matches_results PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_discovered_printed_for_each_found_link PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_discovered_printed_for_start_url PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_duplicate_links_not_discovered_twice PASSED
+tests/test_checker_cli.py::TestCrawlerDiscoveredOutput::test_no_discovered_when_start_url_invalid PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_checked_line_format_with_error_status PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_checked_line_format_with_status_code PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_checked_line_printed_for_each_link PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_no_checked_lines_when_no_links PASSED
+tests/test_checker_cli.py::TestCheckerCheckedOutput::test_summary_line_present_after_checked_lines PASSED
+tests/test_checker_cli.py::TestCheckerThreadSafety::test_checked_lines_are_not_interleaved PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_notify_email_default_is_none PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_notify_email_stores_address PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_output_default_is_none PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_output_long_flag PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_output_short_flag PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_start_url_is_required PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_start_url_stored PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_timeout_default PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_timeout_is_int PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_timeout_long_flag PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_timeout_short_flag PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_user_agent_custom PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_user_agent_default PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_workers_default PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_workers_is_int PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_workers_long_flag PASSED
+tests/test_checker_cli.py::TestBuildArgParser::test_workers_short_flag PASSED
+tests/test_emailer.py::TestBuildEmailRows::test_html_special_chars_are_escaped PASSED
+tests/test_emailer.py::TestBuildEmailRows::test_multiple_rows_joined_by_newline PASSED
+tests/test_emailer.py::TestBuildEmailRows::test_returns_empty_string_for_empty_list PASSED
+tests/test_emailer.py::TestBuildEmailRows::test_single_row_contains_link_referrer_status PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_contains_non_200_count PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_contains_timestamp PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_contains_total_links_count PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_contains_website PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_no_table_when_no_non_200_results PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_table_contains_thead_and_tbody PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_table_present_when_non_200_results_exist PASSED
+tests/test_emailer.py::TestBuildEmailHtml::test_website_html_special_chars_escaped PASSED
+tests/test_emailer.py::TestSendViaResend::test_exception_does_not_propagate PASSED
+tests/test_emailer.py::TestSendViaResend::test_prints_notification_sent_on_success PASSED
+tests/test_emailer.py::TestSendViaResend::test_sdk_called_with_correct_params PASSED
+tests/test_emailer.py::TestSendViaResend::test_warns_to_stderr_on_exception PASSED
+tests/test_emailer.py::TestSendEmailNotification::test_all_200_results_sends_email_with_zero_non_200_count PASSED
+tests/test_emailer.py::TestSendEmailNotification::test_only_non_200_results_included_in_email PASSED
+tests/test_emailer.py::TestSendEmailNotification::test_resend_api_key_set_before_send PASSED
+tests/test_emailer.py::TestSendEmailNotification::test_send_via_resend_called_with_correct_args PASSED
+tests/test_emailer.py::TestSendEmailNotification::test_subject_contains_website_and_count PASSED
+tests/test_emailer.py::TestSendEmailNotification::test_warns_and_returns_when_api_key_missing PASSED
+tests/test_emailer.py::TestSendEmailNotification::test_warns_and_returns_when_from_address_missing PASSED
+tests/test_emailer.py::TestSendEmailNotification::test_warns_for_api_key_not_from_address_when_both_missing PASSED
+tests/test_fetcher.py::TestCheckUrl::test_retries_get_on_405 PASSED
+tests/test_fetcher.py::TestCheckUrl::test_returns_200_on_success PASSED
+tests/test_fetcher.py::TestCheckUrl::test_returns_301_on_redirect PASSED
+tests/test_fetcher.py::TestCheckUrl::test_returns_error_on_url_error PASSED
+tests/test_integration.py::TestIntegration::test_about_page_is_404 PASSED
+tests/test_integration.py::TestIntegration::test_contains_200_status PASSED
+tests/test_integration.py::TestIntegration::test_contains_404_status PASSED
+tests/test_integration.py::TestIntegration::test_csv_has_correct_header PASSED
+tests/test_integration.py::TestIntegration::test_exit_code_is_zero PASSED
+tests/test_normaliser.py::TestNormalise::test_is_internal_different_host PASSED
+tests/test_normaliser.py::TestNormalise::test_is_internal_same_host PASSED
+tests/test_normaliser.py::TestNormalise::test_resolves_protocol_relative_href PASSED
+tests/test_normaliser.py::TestNormalise::test_resolves_relative_path_href PASSED
+tests/test_normaliser.py::TestNormalise::test_resolves_root_relative_href PASSED
+tests/test_normaliser.py::TestNormalise::test_returns_none_for_javascript PASSED
+tests/test_normaliser.py::TestNormalise::test_returns_none_for_mailto PASSED
+tests/test_normaliser.py::TestNormalise::test_strips_fragment_from_absolute_url PASSED
+tests/test_parser.py::TestExtractLinks::test_empty_html_returns_empty_list PASSED
+tests/test_parser.py::TestExtractLinks::test_ignores_non_anchor_tags PASSED
+tests/test_parser.py::TestExtractLinks::test_returns_hrefs_from_anchor_tags PASSED
+tests/test_parser.py::TestExtractLinks::test_skips_empty_href_values PASSED
+tests/test_reporter.py::TestWriteCsv::test_writes_header_and_rows PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_200_rows_do_not_appear_in_table_body PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_all_200_results_produce_empty_table_body PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_empty_results_writes_heading_and_empty_table PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_file_is_created PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_first_non_empty_line_is_heading PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_non_200_rows_appear_in_table_body PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_oserror_on_unwritable_path_causes_systemexit_1 PASSED
+tests/test_reporter.py::TestWriteMarkdownSummary::test_table_header_row_present PASSED
+
+============================= 85 passed in 3.43s ==============================
+```
+
+---
+
+### Test Summary
+
+85 tests run across 7 files. 85 passed, 0 failed, 0 errors.
+Net change from previous run: -1 test (6 urllib-based `TestPostToResend` tests removed, 4 SDK-based `TestSendViaResend` tests added; 1 new `test_resend_api_key_set_before_send` added to `TestSendEmailNotification`).
+
+status: passed
