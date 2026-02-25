@@ -1,4 +1,4 @@
-"""Tests for parser.py."""
+"""Tests for web_parser.py."""
 
 import os
 import sys
@@ -10,11 +10,11 @@ SRC_DIR = os.path.join(PROJECT_ROOT, "src")
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
-import parser as link_parser
+import web_parser as link_parser
 
 
 # ---------------------------------------------------------------------------
-# parser.py
+# web_parser.py
 # ---------------------------------------------------------------------------
 
 class TestExtractLinks(unittest.TestCase):
