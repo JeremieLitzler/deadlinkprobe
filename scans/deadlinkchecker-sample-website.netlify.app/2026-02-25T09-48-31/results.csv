@@ -1,9 +1,0 @@
-link,referrer,http_status_code
-https://deadlinkchecker-sample-website.netlify.app,,200
-https://deadlinkchecker-sample-website.netlify.app/about/,https://deadlinkchecker-sample-website.netlify.app,404
-https://deadlinkchecker-sample-website.netlify.app/blog,https://deadlinkchecker-sample-website.netlify.app,200
-https://deadlinkchecker-sample-website.netlify.app/contact,https://deadlinkchecker-sample-website.netlify.app,200
-http://iamjeremie.me/,https://deadlinkchecker-sample-website.netlify.app/contact,301
-https://deadlinkchecker-sample-website.netlify.app/,https://deadlinkchecker-sample-website.netlify.app/contact,200
-https://iamjeremie.me/,https://deadlinkchecker-sample-website.netlify.app/contact,200
-https://iamjeremie.me/doesnt-exist,https://deadlinkchecker-sample-website.netlify.app/contact,404
