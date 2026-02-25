@@ -4,7 +4,7 @@ from collections import deque
 
 from fetcher import fetch_html
 from normaliser import is_internal, normalise
-from parser import extract_links
+from web_parser import extract_links
 
 
 def crawl(start_url: str, timeout: int, user_agent: str) -> list[tuple[str, str]]:
