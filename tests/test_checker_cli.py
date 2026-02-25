@@ -332,6 +332,5 @@ class TestCheckerThreadSafety(unittest.TestCase):
         checked_urls = [ln.split()[1] for ln in checked_lines]
         self.assertEqual(len(checked_urls), len(set(checked_urls)))
 
-
 if __name__ == "__main__":
     unittest.main(verbosity=2)
