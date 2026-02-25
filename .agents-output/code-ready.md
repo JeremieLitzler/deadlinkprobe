@@ -39,4 +39,41 @@ The nine Object Calisthenics rules were enumerated directly inside the agent pro
 
 The `agent-1-specs.md` change uses an explicit prohibition list (function signatures, pseudocode, variable names, code snippets, import lists) rather than a general statement like "avoid implementation details", because general statements have proven insufficient — the current specs already demonstrate that the agent defaults to including those artefacts when not explicitly forbidden.
 
+## 2026-02-24 - Issue #10: Send email notification when a scan contains non HTTP/200 status
+
+- Created `src/emailer.py` — contains `_build_email_rows`, `_build_email_html`, `_post_to_resend`, and `send_email_notification`. All email logic lives here.
+- Modified `src/reporter.py` — removed all email functions and their imports (`html`, `json`, `urllib.error`, `urllib.request`); now only handles CSV and Markdown output.
+- Modified `src/checker.py` — added `--notify-email` CLI argument; extracted argparse setup into `build_arg_parser()`; extracted env-var reading and `send_email_notification` call into `_maybe_send_notification()`; `main()` delegates to both helpers.
+- Created `tests/test_emailer.py` — covers `_build_email_rows`, `_build_email_html`, `_post_to_resend`, and `send_email_notification`.
+- Modified `tests/test_checker_cli.py` — added `TestBuildArgParser` covering all flags and defaults.
+
+### Technical choices
+
+Email construction is split across three private helpers to keep each function at one level of indentation (Object Calisthenics rule 1). `_build_email_rows` isolates the per-row HTML generation; `_build_email_html` assembles the full body; `_post_to_resend` handles the HTTP call and all error branches. `send_email_notification` is the single public entry point that coordinates them.
+
+Email logic was moved to `emailer.py` to isolate the Resend API concern from CSV/Markdown output in `reporter.py` and from CLI orchestration in `checker.py`. This lets each module be tested independently without the other's concerns leaking in.
+
+`build_arg_parser()` is extracted from `main()` so tests can instantiate the parser directly and call `parse_args()` with controlled input, without spawning a subprocess or mocking `sys.argv` for every case.
+
+`_maybe_send_notification()` is extracted from `main()` so the env-var validation and dispatch logic can be unit-tested without running the full crawl and check pipeline.
+
+`urllib.error.HTTPError` is caught separately from `urllib.error.URLError` because Resend returns structured HTTP errors (with a `.code`) that the spec requires to be reported by status code. `URLError` covers lower-level failures (DNS, timeout) whose `.reason` is more informative than a status code.
+
+`html.escape` is applied to all user-supplied values in the HTML body to prevent injection from malformed URLs in scan results.
+
+The `elif` pattern in `_maybe_send_notification()` for env-var validation is intentional: distinct warning messages per missing variable, and two sequential `if` checks would incorrectly warn twice when both are absent.
+
+## 2026-02-25 - Issue #10 follow-up: use the Resend Python SDK
+
+- Modified `src/emailer.py` — replaced urllib-based transport with the `resend` SDK: removed `_RESEND_API_URL`, `json`, `urllib.error`, `urllib.request`; added `import resend`; renamed `_post_to_resend` to `_send_via_resend`; sets `resend.api_key` inside `send_email_notification` before dispatching; uses `resend.Emails.SendParams` typed dict and `resend.Emails.send(params)`; catches broad `Exception` and prints to stderr so the tool always exits 0.
+- Created `requirements.txt` — single line `resend`; declares the only third-party dependency so `pip install -r requirements.txt` is sufficient before running the tool.
+
+### Technical choices
+
+`resend.api_key` is assigned inside `send_email_notification` (after the env-var guard clauses) rather than at module level so the module can be imported and tested without a valid key present in the environment; the assignment only runs on the hot path where the key has already been validated as non-None.
+
+`_post_to_resend` was renamed to `_send_via_resend` to reflect that the transport is now the SDK rather than a raw HTTP POST; the public interface of `send_email_notification` is unchanged.
+
+`Exception` is caught broadly because the Resend SDK may raise SDK-specific exception types that vary across SDK versions. Catching `Exception` ensures the tool exits 0 regardless of SDK version or failure mode, which the spec requires.
+
 status: ready
