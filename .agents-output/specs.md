@@ -765,4 +765,139 @@ Include in the agent's brain at least one example from the source article that i
 
 These changes must not alter the pipeline flow, the format of other output files, or the responsibilities of any other agent. The versioning agent, tester agent, and orchestrator are unaffected.
 
+## 2026-02-24 - Issue #10: Send email notification when a scan contains non HTTP/200 status
+
+### Goal and Scope
+
+After a scan completes, if any non-200 HTTP status codes were found in the results, the tool optionally sends an email notification to inform the operator that broken or problematic links were detected. This is an opt-in feature: no email is ever sent unless the user explicitly requests notification via a CLI argument.
+
+From the user's perspective, the tool behaves exactly as before when notification is not configured. When configured, after writing the CSV and Markdown summary, the tool attempts to send one email and reports success or failure to the terminal.
+
+Files affected:
+
+- `src/checker.py` — receives the new CLI argument, reads the API key from the environment, and triggers the notification after all output files are written.
+- `src/reporter.py` — gains a new responsibility: constructing and sending the email notification via the Resend API, keeping all output-related concerns in one module.
+
+No other source files require changes. No new source files are created.
+
+### CLI Interface
+
+A single new optional argument `--notify-email` accepts one email address (the recipient). When absent, no notification is attempted. When present, the tool opts into the notification flow.
+
+The Resend API key is read exclusively from the environment variable `RESEND_API_KEY`. The sender address is read from `RESEND_FROM_ADDRESS` (Resend requires a verified sender domain). Both are only consulted when `--notify-email` is provided. No new required arguments are introduced.
+
+### Notification Content
+
+The email subject must identify the scanned website and the count of non-200 results.
+
+The email body must contain:
+
+- The website scanned (the netloc of the start URL).
+- The UTC timestamp of the scan.
+- The total number of links checked.
+- The total number of non-200 results found.
+- If any non-200 result exists, a table with each non-200 result: link URL, referrer, and HTTP status code.
+
+The body is sent as plain text. HTML formatting is required.
+
+### Sending Behaviour
+
+An email is sent only when all three conditions are true:
+
+1. `--notify-email` was provided.
+2. Both `RESEND_API_KEY` and `RESEND_FROM_ADDRESS` are set in the environment.
+
+An email is not sent when:
+
+- `--notify-email` was not provided.
+- Either environment variable is absent (tool prints a warning and skips sending).
+
+When all results are HTTP 200, the email is still sent but the table of non-200 results is omitted from the body.
+
+The notification is always the last action, after the CSV and Markdown summary have been written. A failure to send the email does not affect the tool's exit code.
+
+### API Key Handling
+
+The Resend API key is supplied exclusively via `RESEND_API_KEY`. It is never accepted on the command line or written to any file. The key value is never printed to stdout or stderr.
+
+When `--notify-email` is provided but `RESEND_API_KEY` or `RESEND_FROM_ADDRESS` is absent, the tool prints a warning to stderr and exits normally with code 0. Scan results are unaffected.
+
+### Resend API Integration
+
+A single HTTPS POST to `https://api.resend.com/emails` with an `Authorization: Bearer <api_key>` header, `Content-Type: application/json`, and a JSON body containing the sender, recipient, subject, and an HTML body.
+
+No third-party library is used — the request is made with `urllib.request` from the standard library.
+
+A successful response is HTTP 200. The tool only needs to determine success or failure; it does not store the returned email identifier.
+
+### Edge Cases
+
+| Scenario                                                 | Behaviour                                               |
+| -------------------------------------------------------- | ------------------------------------------------------- |
+| No non-200 results found                                 | Email sent with summary stats; table section omitted.   |
+| `RESEND_API_KEY` not set, `--notify-email` provided      | Warning to stderr; email skipped; exit 0.               |
+| `RESEND_FROM_ADDRESS` not set, `--notify-email` provided | Warning to stderr; email skipped; exit 0.               |
+| Resend API returns non-200                               | Warning to stderr with status received; tool exits 0.   |
+| Resend API raises a network exception                    | Warning to stderr with error description; tool exits 0. |
+| `--notify-email` not provided                            | Notification code never reached; env vars never read.   |
+| Results contain only `ERROR:*` statuses                  | Treated as non-200 and included in the notification.    |
+
+### Constraints
+
+- No third-party libraries introduced; `urllib.request` only.
+- Fully backward-compatible: invocations without `--notify-email` are entirely unaffected.
+- API key and sender address always sourced from environment variables, never CLI arguments.
+- Notification is always the final step and never blocks writing of scan results.
+
+status: superseded
+
+## 2026-02-25 - Issue #10 follow-up: use the Resend Python SDK
+
+### Goal and Scope
+
+Replace the raw `urllib`-based HTTP implementation inside `src/emailer.py` with the official `resend` Python SDK. No other module is affected. All externally observable behaviour — printed output, warnings, exit codes, email content — must remain identical.
+
+The `resend` SDK is a third-party library. Because the project previously depended only on the standard library, a `requirements.txt` file must be introduced to declare this new dependency explicitly.
+
+### Files to Modify
+
+**`src/emailer.py`**
+
+The module currently sends email by constructing a raw HTTP POST through `urllib.request`. It reads three values from the environment at module level: `RESEND_API_KEY`, `RESEND_FROM_ADDRESS`, and `RESEND_API_URL`. The `RESEND_API_URL` constant exists solely to hold the Resend endpoint; the SDK manages the endpoint internally, so that constant and anything that depends on it must be removed. The `urllib.request`, `urllib.error`, `json` imports used for the HTTP call are no longer needed and must be removed. The `resend` SDK must be used in their place.
+
+**`requirements.txt`** (new file)
+
+Must be created at the repository root. It declares `resend` as a dependency so that `pip install -r requirements.txt` installs everything needed to run the tool.
+
+### Rules and Observable Behaviour
+
+The following outcomes must hold exactly as they do today:
+
+| Scenario | Observable outcome |
+| --- | --- |
+| Both env vars set, API call succeeds | Prints `Notification sent.` to stdout |
+| `RESEND_API_KEY` not set | Prints warning to stderr; returns without sending |
+| `RESEND_FROM_ADDRESS` not set | Prints warning to stderr; returns without sending |
+| API call returns an HTTP error | Prints warning with HTTP status to stderr |
+| API call raises a network-level error | Prints warning with error description to stderr |
+
+In all failure cases the tool exits with code 0 and scan results on disk are unaffected.
+
+The email subject, HTML body structure, and recipient are built the same way as before; only the transport layer changes.
+
+### Edge Cases
+
+| Scenario | Behaviour |
+| --- | --- |
+| `resend` package is not installed | Tool fails at import time with a standard `ModuleNotFoundError`; no special handling required |
+| SDK raises an exception on send | Caught and surfaced as a warning to stderr; tool exits 0 |
+| `RESEND_API_URL` still present in the environment | Has no effect; the module no longer reads or uses it |
+
+### Constraints
+
+- The `resend` SDK is the only new dependency permitted.
+- `requirements.txt` must pin the package name; an exact version pin is optional but acceptable.
+- Public-facing CLI behaviour is fully backward-compatible.
+- The `RESEND_API_KEY` and `RESEND_FROM_ADDRESS` environment variables continue to be the sole source of credentials; they are never accepted on the command line or written to any file, and their values are never echoed to stdout or stderr.
+
 status: ready
