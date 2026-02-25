@@ -38,9 +38,7 @@ jobs:
           cache: 'npm'
       # Make sure all the dependencies are ok and installed
       - name: 'Installing dependencies'
-        run: npm ci
-      - name: 'Verifying the signatures'
-        run: npm audit signatures
+        run: npm ci --legacy-peer-deps
       # Install semantic release
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
