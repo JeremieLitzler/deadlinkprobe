@@ -72,6 +72,14 @@ Results are written to a CSV file with the following columns:
 
 ## Testing
 
+### Unit tests
+
+```bash
+python -m pytest tests/ -v
+```
+
+### Integration test
+
 A sample website is available to test the tool against:
 
 ```plaintext
@@ -126,6 +134,12 @@ Human approval gates pause the pipeline after specs and after coding.
 | New feature | `feature/`    |
 | Bug fix     | `fix/`        |
 | Docs only   | `docs/`       |
+
+### Manual testing
+
+```bash
+python src/checker.py https://deadlinkchecker-sample-website.netlify.app
+```
 
 ## License
 
