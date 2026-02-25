@@ -1,6 +1,5 @@
 """Dead link checker — entry point and CLI argument parsing."""
 
-import argparse
 import concurrent.futures
 import datetime
 import os
@@ -8,43 +7,26 @@ import sys
 import threading
 import urllib.parse
 
+import argument_parser
 import crawler
+import emailer
 import fetcher
 import reporter
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Check a website for dead links.",
-    )
-    parser.add_argument("start_url", help="The URL to begin crawling from.")
-    parser.add_argument(
-        "--output", "-o",
-        default=None,
-        help=(
-            "Path to the output CSV file. When omitted, results are written to "
-            "scans/[WEBSITE]/[TIMESTAMP]/results.csv and a README.md summary is also produced."
-        ),
-    )
-    parser.add_argument(
-        "--workers", "-w",
-        type=int,
-        default=10,
-        help="Number of threads in the ThreadPoolExecutor. (default: 10)",
-    )
-    parser.add_argument(
-        "--timeout", "-t",
-        type=int,
-        default=10,
-        help="Per-request timeout in seconds. (default: 10)",
-    )
-    parser.add_argument(
-        "--user-agent",
-        default="deadlinkchecker/1.0",
-        help="User-Agent header sent with every request. (default: deadlinkchecker/1.0)",
-    )
+def _maybe_send_notification(
+    args,
+    results: list[tuple[str, str, str]],
+    website: str,
+    scan_timestamp: str,
+) -> None:
+    if args.notify_email is None:
+        return
+    emailer.send_email_notification(results, website, scan_timestamp, len(results), args.notify_email)
 
-    args = parser.parse_args()
+
+def main() -> None:
+    args = argument_parser.build_arg_parser().parse_args()
 
     scan_timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H-%M-%S")
 
@@ -101,6 +83,8 @@ def main() -> None:
         reporter.write_markdown_summary(results, md_path, scan_timestamp)
 
     print(f"Checked {len(results)} links. Results written to {csv_path}.")
+
+    _maybe_send_notification(args, results, parsed.netloc, scan_timestamp)
 
 
 if __name__ == "__main__":

@@ -55,3 +55,5 @@ def write_markdown_summary(
     except OSError as e:
         print(f"Error: cannot write to '{output_path}': {e}", file=sys.stderr)
         sys.exit(1)
+
+
