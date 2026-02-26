@@ -43,4 +43,14 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "Requires RESEND_API_KEY and RESEND_FROM_ADDRESS environment variables."
         ),
     )
+    parser.add_argument(
+        "--include-3xx-status-code",
+        action="store_true",
+        default=False,
+        help=(
+            "Include 3xx redirect results in the email notification table. "
+            "By default, 3xx results are excluded from the email (but still appear in the CSV). "
+            "Has no effect when --notify-email is absent."
+        ),
+    )
     return parser

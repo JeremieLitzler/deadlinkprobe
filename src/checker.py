@@ -22,7 +22,14 @@ def _maybe_send_notification(
 ) -> None:
     if args.notify_email is None:
         return
-    emailer.send_email_notification(results, website, scan_timestamp, len(results), args.notify_email)
+    emailer.send_email_notification(
+        results,
+        website,
+        scan_timestamp,
+        len(results),
+        args.notify_email,
+        args.include_3xx_status_code,
+    )
 
 
 def main() -> None:
