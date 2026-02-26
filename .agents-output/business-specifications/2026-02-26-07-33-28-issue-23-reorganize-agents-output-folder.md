@@ -76,14 +76,14 @@ Rule: existing content from the four flat accumulating files must be preserved.
 
 | Existing flat file                | Migrates to                                          |
 | --------------------------------- | ---------------------------------------------------- |
-| `.agents-output/user-requests.md` | `.agents-output/user-requests/initial.md`            |
-| `.agents-output/specs.md`         | `.agents-output/business-specifications/initial.md`  |
-| `.agents-output/code-ready.md`    | `.agents-output/technical-specifications/initial.md` |
-| `.agents-output/test-results.md`  | `.agents-output/test-results/initial.md`             |
+| `.agents-output/user-requests.md` | `.agents-output/user-requests/_initial.md`            |
+| `.agents-output/specs.md`         | `.agents-output/business-specifications/_initial.md`  |
+| `.agents-output/code-ready.md`    | `.agents-output/technical-specifications/_initial.md` |
+| `.agents-output/test-results.md`  | `.agents-output/test-results/_initial.md`             |
 
-Rule: after their content is moved to `initial.md` in the respective subfolder, the four original flat files are removed.
+Rule: after their content is moved to `_initial.md` in the respective subfolder, the four original flat files are removed.
 
-Example — a reader looking for previous spec entries will find them at `.agents-output/business-specifications/initial.md`, not at `.agents-output/specs.md`.
+Example — a reader looking for previous spec entries will find them at `.agents-output/business-specifications/_initial.md`, not at `.agents-output/specs.md`.
 
 Rule: `status.md` is not migrated. It remains at `.agents-output/status.md` unchanged.
 
@@ -112,10 +112,10 @@ Rule: every path reference in agent brain files that points to the old flat file
 
 | Old reference                     | New reference                                        |
 | --------------------------------- | ---------------------------------------------------- |
-| `.agents-output/user-requests.md` | `.agents-output/user-requests/initial.md`            |
-| `.agents-output/specs.md`         | `.agents-output/business-specifications/initial.md`  |
-| `.agents-output/code-ready.md`    | `.agents-output/technical-specifications/initial.md` |
-| `.agents-output/test-results.md`  | `.agents-output/test-results/initial.md`             |
+| `.agents-output/user-requests.md` | `.agents-output/user-requests/_initial.md`            |
+| `.agents-output/specs.md`         | `.agents-output/business-specifications/_initial.md`  |
+| `.agents-output/code-ready.md`    | `.agents-output/technical-specifications/_initial.md` |
+| `.agents-output/test-results.md`  | `.agents-output/test-results/_initial.md`             |
 
 Rule: the orchestrator brain file must describe how agents determine the correct timestamped filename for the current run (shared timestamp established at Step 0).
 
@@ -207,7 +207,7 @@ ci(agent): update CLAUDE.md to reference new output structure #23
 
 ## Edge Cases
 
-Rule: if a flat file does not exist at migration time (e.g. `code-ready.md` was never created), no `initial.md` is created for that subfolder. The subfolder is still created.
+Rule: if a flat file does not exist at migration time (e.g. `code-ready.md` was never created), no `_initial.md` is created for that subfolder. The subfolder is still created.
 
 Rule: if `business-specifications/` already exists (as in this very run), the existing files in it are not overwritten.
 

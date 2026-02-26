@@ -34,18 +34,18 @@ Checked for presence of each old flat file under `.agents-output/`:
 
 **Result: PASS**
 
-## Check 3: Migration — initial.md files exist and are non-empty
+## Check 3: Migration — _initial.md files exist and are non-empty
 
-Checked each subfolder for `initial.md` and its byte size:
+Checked each subfolder for `_initial.md` and its byte size:
 
-| Subfolder                   | initial.md exists | Size (bytes) |
+| Subfolder                   | _initial.md exists | Size (bytes) |
 | --------------------------- | ----------------- | ------------ |
 | `user-requests/`            | yes               | 3 797        |
 | `business-specifications/`  | yes               | 50 026       |
 | `technical-specifications/` | yes               | 8 322        |
 | `test-results/`             | yes               | 56 133       |
 
-All four `initial.md` files are present and non-empty.
+All four `_initial.md` files are present and non-empty.
 
 **Result: PASS**
 
@@ -106,6 +106,6 @@ Grep for old flat path patterns in CLAUDE.md returned no matches. PASS
 
 ### Test Summary
 
-All six checks passed. The folder restructure is complete: old flat files are removed, the four subfolders each contain `initial.md` with migrated content, agent brain files use the new subfolder paths (with the single intentional legacy exception in `agent-4-git.md`), CLAUDE.md reflects the new subfolder conventions throughout, and no source or test code was touched.
+All six checks passed. The folder restructure is complete: old flat files are removed, the four subfolders each contain `_initial.md` with migrated content, agent brain files use the new subfolder paths (with the single intentional legacy exception in `agent-4-git.md`), CLAUDE.md reflects the new subfolder conventions throughout, and no source or test code was touched.
 
 status: passed

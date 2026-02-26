@@ -2,13 +2,13 @@
 
 ## Files Created
 
-- `.agents-output/user-requests/initial.md` — migrated content from the former `user-requests.md`
+- `.agents-output/user-requests/_initial.md` — migrated content from the former `user-requests.md`
 - `.agents-output/user-requests/2026-02-26-07-33-28-issue-23-reorganize-agents-output-folder.md` — user request for this issue
-- `.agents-output/business-specifications/initial.md` — migrated content from the former `specs.md`
+- `.agents-output/business-specifications/_initial.md` — migrated content from the former `specs.md`
 - `.agents-output/business-specifications/2026-02-26-07-33-28-issue-23-reorganize-agents-output-folder.md` — spec for this issue
-- `.agents-output/technical-specifications/initial.md` — migrated content from the former `code-ready.md`
+- `.agents-output/technical-specifications/_initial.md` — migrated content from the former `code-ready.md`
 - `.agents-output/technical-specifications/2026-02-26-07-33-28-issue-23-reorganize-agents-output-folder.md` — this file
-- `.agents-output/test-results/initial.md` — migrated content from the former `test-results.md`
+- `.agents-output/test-results/_initial.md` — migrated content from the former `test-results.md`
 
 ## Files Deleted
 
