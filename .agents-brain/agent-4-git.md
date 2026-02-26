@@ -44,13 +44,13 @@ Pull latest `main` to ensure the branch is created from a clean base.
 
 ### Task 2: Create new branch
 
-Read the user request file passed by the orchestrator (`user-requests/[timestamp-slug].md`) to understand the nature of the change (feature, fix, or docs).
+Read the user request file passed by the orchestrator (`0-user-requests/[timestamp-slug].md`) to understand the nature of the change (feature, fix, or docs).
 
 Create the branch according to `CLAUDE.md` instructions before any other agent writes files.
 
 ### Task 3: Commit specs output
 
-Stage `.agents-output/business-specifications/[timestamp-slug].md` (filename passed by orchestrator) and commit it on the current branch with a short message such as:
+Stage `.agents-output/1-business-specifications/[timestamp-slug].md` (filename passed by orchestrator) and commit it on the current branch with a short message such as:
 
 ```plaintext
 feat(specs): record specs for [short description]
@@ -60,17 +60,17 @@ Do not push yet.
 
 ### Task 4: Commit code changes
 
-Read `.agents-output/technical-specifications/[timestamp-slug].md` (passed by orchestrator) for the list of files changed.
+Read `.agents-output/2-technical-specifications/[timestamp-slug].md` (passed by orchestrator) for the list of files changed.
 
-Stage those source files plus `.agents-output/technical-specifications/[timestamp-slug].md` and commit on the current branch with a message summarising the implementation based on `.agents-output/business-specifications/[timestamp-slug].md`. Do not push yet.
+Stage those source files plus `.agents-output/2-technical-specifications/[timestamp-slug].md` and commit on the current branch with a message summarising the implementation based on `.agents-output/1-business-specifications/[timestamp-slug].md`. Do not push yet.
 
 ### Task 5: Commit test results and push
 
-Read `.agents-output/test-results/[timestamp-slug].md` (passed by orchestrator).
+Read `.agents-output/3-test-results/[timestamp-slug].md` (passed by orchestrator).
 
 If the last line is `status: passed`:
 
-- Stage the test files introduced or modified and `.agents-output/test-results/[timestamp-slug].md`.
-- Write a meaningful commit message that summarises the change based on `.agents-output/business-specifications/[timestamp-slug].md` within Git recommended message length. Put anything beyond the commit message limit into the commit description.
+- Stage the test files introduced or modified and `.agents-output/3-test-results/[timestamp-slug].md`.
+- Write a meaningful commit message that summarises the change based on `.agents-output/1-business-specifications/[timestamp-slug].md` within Git recommended message length. Put anything beyond the commit message limit into the commit description.
 - Commit on the current feature branch — never commit directly to main.
 - Push the branch to origin.

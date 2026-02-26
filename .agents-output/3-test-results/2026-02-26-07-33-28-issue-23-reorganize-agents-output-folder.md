@@ -6,17 +6,17 @@ Verified that `.agents-output/` contains exactly the expected entries.
 
 Actual contents of `.agents-output/`:
 ```
-business-specifications/
+1-business-specifications/
 status.md
-technical-specifications/
-test-results/
-user-requests/
+2-technical-specifications/
+3-test-results/
+0-user-requests/
 ```
 
-- `user-requests/` present: PASS
-- `business-specifications/` present: PASS
-- `technical-specifications/` present: PASS
-- `test-results/` present: PASS
+- `0-user-requests/` present: PASS
+- `1-business-specifications/` present: PASS
+- `2-technical-specifications/` present: PASS
+- `3-test-results/` present: PASS
 - `status.md` present: PASS
 - No extra files or directories at root level: PASS
 
@@ -40,10 +40,10 @@ Checked each subfolder for `_initial.md` and its byte size:
 
 | Subfolder                   | _initial.md exists | Size (bytes) |
 | --------------------------- | ----------------- | ------------ |
-| `user-requests/`            | yes               | 3 797        |
-| `business-specifications/`  | yes               | 50 026       |
-| `technical-specifications/` | yes               | 8 322        |
-| `test-results/`             | yes               | 56 133       |
+| `0-user-requests/`            | yes               | 3 797        |
+| `1-business-specifications/`  | yes               | 50 026       |
+| `2-technical-specifications/` | yes               | 8 322        |
+| `3-test-results/`             | yes               | 56 133       |
 
 All four `_initial.md` files are present and non-empty.
 
@@ -73,24 +73,24 @@ Verified that the "Multi-Agent Pipeline" section in `CLAUDE.md` no longer refere
 
 ### Save path (line 85)
 ```
-Save the request to `.agents-output/user-requests/[timestamp-slug].md`.
+Save the request to `.agents-output/0-user-requests/[timestamp-slug].md`.
 ```
 No old `user-requests.md` reference. PASS
 
 ### Agents table (lines 94–97)
 All Reads/Writes columns reference subfolder paths with `[timestamp-slug].md` filenames:
-- Specification reads `user-requests/[timestamp-slug].md`, writes `business-specifications/[timestamp-slug].md` — PASS
-- Coder reads `business-specifications/[timestamp-slug].md`, writes `technical-specifications/[timestamp-slug].md` — PASS
-- Tester reads both spec subfolders, writes `test-results/[timestamp-slug].md` — PASS
-- Versioning reads `business-specifications/[timestamp-slug].md` and `test-results/[timestamp-slug].md` — PASS
+- Specification reads `0-user-requests/[timestamp-slug].md`, writes `1-business-specifications/[timestamp-slug].md` — PASS
+- Coder reads `1-business-specifications/[timestamp-slug].md`, writes `2-technical-specifications/[timestamp-slug].md` — PASS
+- Tester reads both spec subfolders, writes `3-test-results/[timestamp-slug].md` — PASS
+- Versioning reads `1-business-specifications/[timestamp-slug].md` and `3-test-results/[timestamp-slug].md` — PASS
 
 ### Pipeline flow diagram (lines 101–118)
 Diagram shows subfolder names rather than flat filenames:
 ```
-[user-requests/[timestamp-slug].md]
-  Specs agent → business-specifications/[timestamp-slug].md
-  Coder agent → technical-specifications/[timestamp-slug].md
- Tester agent → test-results/[timestamp-slug].md
+[0-user-requests/[timestamp-slug].md]
+  Specs agent → 1-business-specifications/[timestamp-slug].md
+  Coder agent → 2-technical-specifications/[timestamp-slug].md
+ Tester agent → 3-test-results/[timestamp-slug].md
 ```
 No old flat file names present. PASS
 

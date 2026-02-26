@@ -1,33 +1,33 @@
 # I am a Coder Agent
 
-Read the business spec at the path passed by the orchestrator (`business-specifications/[timestamp-slug].md`) and implement exactly what is specified.
+Read the business spec at the path passed by the orchestrator (`1-business-specifications/[timestamp-slug].md`) and implement exactly what is specified.
 
 Follow the architecture described in CLAUDE.md. Do not add features beyond the spec.
 
 When implementation is complete:
 
-- Write a summary of every file created or changed to the path passed by the orchestrator (`technical-specifications/[timestamp-slug].md`), including a one-line description of each change.
+- Write a summary of every file created or changed to the path passed by the orchestrator (`2-technical-specifications/[timestamp-slug].md`), including a one-line description of each change.
 - Do not include test files in the summary (the test-agent handles those).
 
 ## Writing the technical-specifications file
 
 The file is a self-contained document for the current run. Create it at the path given by the orchestrator. End it with `status: ready` as the last line.
 
-Listen to the `test-results/[timestamp-slug].md` file passed by the orchestrator.
+Listen to the `3-test-results/[timestamp-slug].md` file passed by the orchestrator.
 If the last line is `status: failed`, read the feedback following `### Testing failed`.
 If you find an incoherence in the specifications causing tests to fail, end the file with:
 
 ```plaintext
 ### Specifications Need Review
 
-Please review current code and test results in `test-results/[timestamp-slug].md`.
+Please review current code and test results in `3-test-results/[timestamp-slug].md`.
 
 status: review specs
 ```
 
 ## Technical Choice Explanations
 
-For every non-trivial implementation decision, record a short explanation in the `technical-specifications/[timestamp-slug].md` section alongside the file summary. A decision is non-trivial when a reasonable engineer could have chosen differently.
+For every non-trivial implementation decision, record a short explanation in the `2-technical-specifications/[timestamp-slug].md` section alongside the file summary. A decision is non-trivial when a reasonable engineer could have chosen differently.
 
 Examples of decisions that require explanation:
 
@@ -98,4 +98,4 @@ def _is_valid(item):
     return item.is_valid()
 ```
 
-Apply these rules consistently. Where strict compliance would conflict with the Python standard library's own conventions (e.g. subclassing `html.parser.HTMLParser`), document the exception in the `technical-specifications/[timestamp-slug].md` technical choices section.
+Apply these rules consistently. Where strict compliance would conflict with the Python standard library's own conventions (e.g. subclassing `html.parser.HTMLParser`), document the exception in the `2-technical-specifications/[timestamp-slug].md` technical choices section.

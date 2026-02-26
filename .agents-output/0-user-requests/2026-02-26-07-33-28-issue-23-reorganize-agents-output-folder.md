@@ -4,13 +4,13 @@ Instead of flat `.md` files, use subfolders with timestamp-named files:
 
 ```plaintext
 .agents-output/
-├── user-requests/                  # orchestrator writes here
+├── 0-user-requests/                  # orchestrator writes here
 │       └── [timestamp]-issue-[id]-[slug].md
-├── business-specifications/        # specs agent writes here
+├── 1-business-specifications/        # specs agent writes here
 │       └── [timestamp]-issue-[id]-[slug].md
-├── technical-specifications/       # coder agent writes here
+├── 2-technical-specifications/       # coder agent writes here
 │       └── [timestamp]-issue-[id]-[slug].md
-├── test-results/                   # tester agent writes here
+├── 3-test-results/                   # tester agent writes here
 │       └── [timestamp]-issue-[id]-[slug].md
 └── status.md
 ```

@@ -82,7 +82,7 @@ A dead link checker CLI tool. Given a starting URL:
 
 **When the user provides a feature request or bug fix, act as the orchestrator:**
 
-1. Save the request to `.agents-output/user-requests/[timestamp-slug].md`.
+1. Save the request to `.agents-output/0-user-requests/[timestamp-slug].md`.
 2. Follow the pipeline in `.agents-brain/agent-0-orchestrator.md` step by step.
 
 The user never needs to run a command — just describe what they want and the pipeline starts.
@@ -91,28 +91,28 @@ The user never needs to run a command — just describe what they want and the p
 
 | Agent         | Prompt                      | Reads                                         | Writes                    |
 | ------------- | --------------------------- | --------------------------------------------- | ------------------------- |
-| Specification | `.agents-brain/agent-1-specs.md`  | `.agents-output/user-requests/[timestamp-slug].md`                                                                    | `.agents-output/business-specifications/[timestamp-slug].md`  |
-| Coder         | `.agents-brain/agent-2-coder.md`  | `.agents-output/business-specifications/[timestamp-slug].md`                                                          | `.agents-output/technical-specifications/[timestamp-slug].md` |
-| Tester        | `.agents-brain/agent-3-tester.md` | `.agents-output/business-specifications/[timestamp-slug].md`, `.agents-output/technical-specifications/[timestamp-slug].md` | `.agents-output/test-results/[timestamp-slug].md`        |
-| Versioning    | `.agents-brain/agent-4-git.md`    | `.agents-output/business-specifications/[timestamp-slug].md`, `.agents-output/test-results/[timestamp-slug].md`       | git history                                                    |
+| Specification | `.agents-brain/agent-1-specs.md`  | `.agents-output/0-user-requests/[timestamp-slug].md`                                                                    | `.agents-output/1-business-specifications/[timestamp-slug].md`  |
+| Coder         | `.agents-brain/agent-2-coder.md`  | `.agents-output/1-business-specifications/[timestamp-slug].md`                                                          | `.agents-output/2-technical-specifications/[timestamp-slug].md` |
+| Tester        | `.agents-brain/agent-3-tester.md` | `.agents-output/1-business-specifications/[timestamp-slug].md`, `.agents-output/2-technical-specifications/[timestamp-slug].md` | `.agents-output/3-test-results/[timestamp-slug].md`        |
+| Versioning    | `.agents-brain/agent-4-git.md`    | `.agents-output/1-business-specifications/[timestamp-slug].md`, `.agents-output/3-test-results/[timestamp-slug].md`       | git history                                                    |
 
 ### Pipeline flow
 
 ```
-[user-requests/[timestamp-slug].md]
+[0-user-requests/[timestamp-slug].md]
        ↓
 Versioning agent → branch
        ↓
-  Specs agent → business-specifications/[timestamp-slug].md
+  Specs agent → 1-business-specifications/[timestamp-slug].md
        ↓
 Versioning agent → commit specs
        ↓ ← human approval
-  Coder agent → technical-specifications/[timestamp-slug].md
+  Coder agent → 2-technical-specifications/[timestamp-slug].md
        ↓           ↑ status: review specs (loops back)
        ↓
 Versioning agent → commit code
        ↓ ← human approval
- Tester agent → test-results/[timestamp-slug].md
+ Tester agent → 3-test-results/[timestamp-slug].md
        ↓           ↑ status: failed (loops back to coder)
 Versioning agent → commit tests + push
 ```

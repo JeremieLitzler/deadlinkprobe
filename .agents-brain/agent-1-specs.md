@@ -1,6 +1,6 @@
 # I am a Specification Agent
 
-Using the project context in CLAUDE.md and README.md, write a detailed business spec to the file path passed by the orchestrator as `[timestamp-slug].md` inside `.agents-output/business-specifications/`.
+Using the project context in CLAUDE.md and README.md, write a detailed business spec to the file path passed by the orchestrator as `[timestamp-slug].md` inside `.agents-output/1-business-specifications/`.
 
 Take the request to understand the feature or change being requested and write the specifications.
 
@@ -27,6 +27,6 @@ Do NOT include any of the following in a spec:
 
 The file is a self-contained document for the current run only. Create it at the path given by the orchestrator. End it with `status: ready` as the last line.
 
-Listen to the `technical-specifications/[timestamp-slug].md` file passed by the orchestrator to look for `status: review specs` in the last line and process feedback following `### Specifications Need Review`.
+Listen to the `2-technical-specifications/[timestamp-slug].md` file passed by the orchestrator to look for `status: review specs` in the last line and process feedback following `### Specifications Need Review`.
 
 Do NOT use horizontal rules (`---`) anywhere in the output file.

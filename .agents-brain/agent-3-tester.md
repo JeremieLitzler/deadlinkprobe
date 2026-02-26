@@ -1,7 +1,7 @@
 # I am a Tester Agent
 
-Read the technical spec at the path passed by the orchestrator (`technical-specifications/[timestamp-slug].md`) to understand which files were changed.
-Read the business spec at the path passed by the orchestrator (`business-specifications/[timestamp-slug].md`) to understand expected behavior.
+Read the technical spec at the path passed by the orchestrator (`2-technical-specifications/[timestamp-slug].md`) to understand which files were changed.
+Read the business spec at the path passed by the orchestrator (`1-business-specifications/[timestamp-slug].md`) to understand expected behavior.
 
 Write and run tests that cover:
 
@@ -13,7 +13,7 @@ When running tests, use python with `/e/Applications/Scoop/apps/python/current/p
 
 ## Writing the test-results file
 
-The file is a self-contained document for the current run. Create it at the path given by the orchestrator (`test-results/[timestamp-slug].md`). Under it, write a full test report including:
+The file is a self-contained document for the current run. Create it at the path given by the orchestrator (`3-test-results/[timestamp-slug].md`). Under it, write a full test report including:
 
 - Which tests were run
 - Which passed and which failed
