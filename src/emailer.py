@@ -68,12 +68,17 @@ def _send_via_resend(
         )
 
 
+def _is_3xx(status: str) -> bool:
+    return len(status) == 3 and status.startswith("3") and status.isdigit()
+
+
 def send_email_notification(
     results: list[tuple[str, str, str]],
     website: str,
     timestamp: str,
     total_links: int,
     notify_email: str,
+    include_3xx: bool = False,
 ) -> None:
     """Send an email notification with scan results via the Resend API.
 
@@ -89,6 +94,9 @@ def send_email_notification(
         Total number of links checked.
     notify_email:
         Recipient email address.
+    include_3xx:
+        When False (default), 3xx redirect results are excluded from the email
+        table and subject-line count. When True, they are included.
     """
     if _RESEND_API_KEY is None:
         print("Warning: RESEND_API_KEY is not set; notification skipped.", file=sys.stderr)
@@ -97,7 +105,10 @@ def send_email_notification(
         print("Warning: RESEND_FROM_ADDRESS is not set; notification skipped.", file=sys.stderr)
         return
     resend.api_key = _RESEND_API_KEY
-    non_200_results = [row for row in results if row[2] != "200"]
+    non_200_results = [
+        row for row in results
+        if row[2] != "200" and (include_3xx or not _is_3xx(row[2]))
+    ]
     non_200_count = len(non_200_results)
     subject = "Dead link scan: {} — {} non-200 result(s)".format(website, non_200_count)
     body = _build_email_html(website, timestamp, total_links, non_200_results)

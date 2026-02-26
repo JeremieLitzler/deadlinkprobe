@@ -7,7 +7,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "python -m pytest tests/ -v"
+    "test": "python -m pytest tests/ -v",
+    "scan": "python src/checker.py https://deadlinkchecker-sample-website.netlify.app/",
+    "scan-with-email": "python src/checker.py https://deadlinkchecker-sample-website.netlify.app/ --notify-email "
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",

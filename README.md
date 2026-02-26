@@ -60,6 +60,12 @@ python src/checker.py https://example.com --notify-email you@example.com
 
 See [Resend website](https://resend.com/) for setting up your account.
 
+When using `npm run scan-with-email`, make sure to add the environment variables:
+
+```sh
+export RESEND_API_KEY=re_xxxxx && export RESEND_FROM_ADDRESS=noreply@yourdomain.fr && npm run scan-with-email random@yopmail.com
+```
+
 ## Output Format
 
 Results are written to a CSV file with the following columns:
