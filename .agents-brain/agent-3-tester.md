@@ -1,7 +1,7 @@
 # I am a Tester Agent
 
-Read `.agents-output/code-ready.md` to understand which files were changed.
-Read `.agents-output/specs.md` to understand expected behavior.
+Read the technical spec at the path passed by the orchestrator (`technical-specifications/[timestamp-slug].md`) to understand which files were changed.
+Read the business spec at the path passed by the orchestrator (`business-specifications/[timestamp-slug].md`) to understand expected behavior.
 
 Write and run tests that cover:
 
@@ -11,18 +11,15 @@ Write and run tests that cover:
 
 When running tests, use python with `/e/Applications/Scoop/apps/python/current/python.exe`.
 
-## Writing to `.agents-output/test-results.md`
+## Writing the test-results file
 
-The file accumulates entries across tasks. Do not overwrite previous content.
+The file is a self-contained document for the current run. Create it at the path given by the orchestrator (`test-results/[timestamp-slug].md`). Under it, write a full test report including:
 
-- If the file does not exist, create it with the first line `# Output of Agent Tester`, then a blank line.
-- Append a new `## YYYY-MM-DD - [Short description of feature or Issue id with a #]` section (today's date).
-- Under it, write a full test report including:
-  - Which tests were run
-  - Which passed and which failed
-  - Output or stack traces for any failures
+- Which tests were run
+- Which passed and which failed
+- Output or stack traces for any failures
 
-End the new section with either:
+End the file with either:
 
 ```plaintext
 ### Test Summary

@@ -5,7 +5,7 @@ The orchestrator will call me multiple times during the pipeline. Execute only t
 ## Commit Rules
 
 - any modification to `.agents-brain` files, or `CLAUDE.md` or `.claude\settings.local.json` must use commit type and scope = `ci(agent)`.
-- any modification to `.agents-output/specs.md` file must use commit type = `docs`
+- any modification to `.agents-output/specs.md` file must use commit type = `docs`, **except for issue #23** for which it should use `ci(agent)`.
 - any modification to `.github\workflows` files must use commit type = `ci`
 - any other modification to files must follow the conventional commits. Here is a summary:
 
@@ -44,33 +44,33 @@ Pull latest `main` to ensure the branch is created from a clean base.
 
 ### Task 2: Create new branch
 
-Read `.agents-output/user-requests.md` to understand the nature of the change (feature, fix, or docs).
+Read the user request file passed by the orchestrator (`user-requests/[timestamp-slug].md`) to understand the nature of the change (feature, fix, or docs).
 
 Create the branch according to `CLAUDE.md` instructions before any other agent writes files.
 
 ### Task 3: Commit specs output
 
-Stage `.agents-output/specs.md` and commit it on the current branch with a short message such as:
+Stage `.agents-output/business-specifications/[timestamp-slug].md` (filename passed by orchestrator) and commit it on the current branch with a short message such as:
 
-```
-chore: record specs for [short description]
+```plaintext
+feat(specs): record specs for [short description]
 ```
 
 Do not push yet.
 
 ### Task 4: Commit code changes
 
-Read `.agents-output/code-ready.md` (latest section) for the list of files changed.
+Read `.agents-output/technical-specifications/[timestamp-slug].md` (passed by orchestrator) for the list of files changed.
 
-Stage those source files plus `.agents-output/code-ready.md` and commit on the current branch with a message summarising the implementation based on `.agents-output/specs.md`. Do not push yet.
+Stage those source files plus `.agents-output/technical-specifications/[timestamp-slug].md` and commit on the current branch with a message summarising the implementation based on `.agents-output/business-specifications/[timestamp-slug].md`. Do not push yet.
 
 ### Task 5: Commit test results and push
 
-Read `.agents-output/test-results.md`.
+Read `.agents-output/test-results/[timestamp-slug].md` (passed by orchestrator).
 
 If the last line is `status: passed`:
 
-- Stage the test files introduced or modified and `.agents-output/test-results.md`.
-- Write a meaningful commit message that summarises the change based on `.agents-output/specs.md` within Git recommended message length. Put anything beyond the commit message limit into the commit description.
+- Stage the test files introduced or modified and `.agents-output/test-results/[timestamp-slug].md`.
+- Write a meaningful commit message that summarises the change based on `.agents-output/business-specifications/[timestamp-slug].md` within Git recommended message length. Put anything beyond the commit message limit into the commit description.
 - Commit on the current feature branch — never commit directly to main.
 - Push the branch to origin.
