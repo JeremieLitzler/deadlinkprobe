@@ -81,10 +81,10 @@ class TestIntegration(unittest.TestCase):
         statuses = [row["http_status_code"] for row in self.csv_rows]
         self.assertIn("404", statuses, msg=f"No 404 found. Rows: {self.csv_rows}")
 
-    def test_contains_200_status(self):
-        """At least one row has http_status_code of 200."""
+    def test_200_status_excluded_by_default_filter(self):
+        """200 rows are excluded from CSV by the default filter (404,500)."""
         statuses = [row["http_status_code"] for row in self.csv_rows]
-        self.assertIn("200", statuses, msg=f"No 200 found. Rows: {self.csv_rows}")
+        self.assertNotIn("200", statuses, msg=f"Unexpected 200 in filtered output. Rows: {self.csv_rows}")
 
     def test_about_page_is_404(self):
         """The /about/ page appears in results with status 404."""
@@ -97,6 +97,52 @@ class TestIntegration(unittest.TestCase):
             len(matching) >= 1,
             msg=f"Expected {about_url!r} with status 404. Rows: {self.csv_rows}",
         )
+
+
+class TestIntegrationNoFilter(unittest.TestCase):
+    """Live integration test with --keep-status-codes '' (no filter) to verify 200 rows appear."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp_output = tempfile.NamedTemporaryFile(
+            suffix=".csv", delete=False
+        ).name
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                CHECKER_PATH,
+                SAMPLE_SITE,
+                "--output", cls.tmp_output,
+                "--workers", "5",
+                "--timeout", "15",
+                "--keep-status-codes", "",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        cls.exit_code = result.returncode
+
+        cls.csv_rows = []
+        if os.path.exists(cls.tmp_output):
+            with open(cls.tmp_output, newline="", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                cls.csv_rows = list(reader)
+
+    @classmethod
+    def tearDownClass(cls):
+        if os.path.exists(cls.tmp_output):
+            os.unlink(cls.tmp_output)
+
+    def test_exit_code_is_zero(self):
+        """The checker exits with code 0 when --keep-status-codes is empty."""
+        self.assertEqual(self.exit_code, 0)
+
+    def test_contains_200_status_when_no_filter(self):
+        """200 rows appear in CSV when --keep-status-codes '' disables filtering."""
+        statuses = [row["http_status_code"] for row in self.csv_rows]
+        self.assertIn("200", statuses, msg=f"No 200 found. Rows: {self.csv_rows}")
 
 
 if __name__ == "__main__":

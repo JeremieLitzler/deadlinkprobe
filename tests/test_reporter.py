@@ -140,8 +140,8 @@ class TestWriteMarkdownSummary(unittest.TestCase):
         finally:
             os.unlink(tmp_path)
 
-    def test_200_rows_do_not_appear_in_table_body(self):
-        """Rows with status 200 are excluded from the table body."""
+    def test_all_received_rows_appear_in_table_body(self):
+        """write_markdown_summary writes all received rows; filtering is the caller's responsibility."""
         results = [
             ("https://example.com/ok", "https://example.com/", "200"),
             ("https://example.com/gone", "https://example.com/", "404"),
@@ -153,20 +153,16 @@ class TestWriteMarkdownSummary(unittest.TestCase):
         try:
             reporter.write_markdown_summary(results, tmp_path, self.TIMESTAMP)
             with open(tmp_path, encoding="utf-8") as f:
-                lines = f.readlines()
-            # Data rows are lines containing '|' that come after the separator row
-            separator_idx = next(
-                i for i, ln in enumerate(lines) if ln.startswith("|---|")
-            )
-            data_lines = [ln for ln in lines[separator_idx + 1:] if ln.strip()]
-            # None of the data rows should reference the 200 URL
-            for ln in data_lines:
-                self.assertNotIn("https://example.com/ok", ln)
+                content = f.read()
+            self.assertIn("https://example.com/ok", content)
+            self.assertIn("200", content)
+            self.assertIn("https://example.com/gone", content)
+            self.assertIn("404", content)
         finally:
             os.unlink(tmp_path)
 
-    def test_all_200_results_produce_empty_table_body(self):
-        """When every result is 200, the table body contains no data rows."""
+    def test_all_received_rows_appear_when_only_200s_passed(self):
+        """write_markdown_summary writes every row it receives, including 200s."""
         results = [
             ("https://example.com/a", "https://example.com/", "200"),
             ("https://example.com/b", "https://example.com/", "200"),
@@ -179,16 +175,14 @@ class TestWriteMarkdownSummary(unittest.TestCase):
             reporter.write_markdown_summary(results, tmp_path, self.TIMESTAMP)
             with open(tmp_path, encoding="utf-8") as f:
                 lines = f.readlines()
-            # Header and separator must be present
             content = "".join(lines)
             self.assertIn("| URL | Referrer | HTTP Status |", content)
             self.assertIn("|---|---|---|", content)
-            # No data rows after the separator
             separator_idx = next(
                 i for i, ln in enumerate(lines) if ln.startswith("|---|")
             )
             data_lines = [ln for ln in lines[separator_idx + 1:] if ln.strip()]
-            self.assertEqual(data_lines, [])
+            self.assertEqual(len(data_lines), 2)
         finally:
             os.unlink(tmp_path)
 

@@ -24,7 +24,7 @@ def _build_filter(args) -> status_filter_module.StatusFilter:
         )
         if args.keep_status_codes is None:
             include_3xx_compat = True
-    codes_raw = args.keep_status_codes or "404,500"
+    codes_raw = args.keep_status_codes if args.keep_status_codes is not None else "404,500"
     return status_filter_module.build_filter(codes_raw, include_3xx_compat)
 
 

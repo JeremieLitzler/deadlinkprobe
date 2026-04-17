@@ -117,6 +117,33 @@ class TestBuildArgParser(unittest.TestCase):
         args = self._parse(["https://example.com/", "--notify-email", "user@example.com"])
         self.assertEqual(args.notify_email, "user@example.com")
 
+    # --- --keep-status-codes ---
+
+    def test_keep_status_codes_default_is_none(self):
+        """--keep-status-codes defaults to None when omitted."""
+        args = self._parse(["https://example.com/"])
+        self.assertIsNone(args.keep_status_codes)
+
+    def test_keep_status_codes_stores_value(self):
+        """--keep-status-codes stores the provided string."""
+        args = self._parse(["https://example.com/", "--keep-status-codes", "404,500,403"])
+        self.assertEqual(args.keep_status_codes, "404,500,403")
+
+    def test_keep_status_codes_accepts_single_code(self):
+        """--keep-status-codes accepts a single status code."""
+        args = self._parse(["https://example.com/", "--keep-status-codes", "404"])
+        self.assertEqual(args.keep_status_codes, "404")
+
+    def test_keep_status_codes_accepts_empty_string(self):
+        """--keep-status-codes accepts an empty string (means no filter)."""
+        args = self._parse(["https://example.com/", "--keep-status-codes", ""])
+        self.assertEqual(args.keep_status_codes, "")
+
+    def test_keep_status_codes_is_string(self):
+        """--keep-status-codes stores value as a string."""
+        args = self._parse(["https://example.com/", "--keep-status-codes", "404,500"])
+        self.assertIsInstance(args.keep_status_codes, str)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

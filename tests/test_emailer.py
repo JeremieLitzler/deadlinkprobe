@@ -67,10 +67,12 @@ class TestBuildEmailHtml(unittest.TestCase):
     """Tests for emailer._build_email_html()."""
 
     def _build(self, website="example.com", timestamp="2026-02-24T14-05-32",
-               total_links=10, non_200_results=None):
+               total_links=10, non_200_results=None, excluded_summary=None):
         if non_200_results is None:
             non_200_results = []
-        return emailer._build_email_html(website, timestamp, total_links, non_200_results)
+        if excluded_summary is None:
+            excluded_summary = {}
+        return emailer._build_email_html(website, timestamp, total_links, non_200_results, excluded_summary)
 
     def test_contains_website(self):
         """Output contains the website name."""
@@ -205,17 +207,20 @@ class TestSendEmailNotification(unittest.TestCase):
         ("https://example.com/gone", "https://example.com/", "404"),
     ]
 
-    def _call_with_env(self, api_key, from_address, results=None, notify_email="user@example.com"):
+    def _call_with_env(self, api_key, from_address, filtered_results=None, excluded_summary=None, notify_email="user@example.com"):
         """Patch module-level env-var constants and call send_email_notification."""
-        if results is None:
-            results = self._RESULTS
+        if filtered_results is None:
+            filtered_results = [r for r in self._RESULTS if r[2] != "200"]
+        if excluded_summary is None:
+            excluded_summary = {}
         with patch.object(emailer, "_RESEND_API_KEY", api_key), \
              patch.object(emailer, "_RESEND_FROM_ADDRESS", from_address):
             emailer.send_email_notification(
-                results=results,
+                filtered_results=filtered_results,
+                excluded_summary=excluded_summary,
                 website="example.com",
                 timestamp="2026-02-24T14-05-32",
-                total_links=len(results),
+                total_links=len(self._RESULTS),
                 notify_email=notify_email,
             )
 
@@ -251,53 +256,58 @@ class TestSendEmailNotification(unittest.TestCase):
 
     # --- filters non-200 results ---
 
-    def test_only_non_200_results_included_in_email(self):
-        """Only non-200 rows are passed to _build_email_html."""
+    def test_filtered_results_passed_to_build_email_html(self):
+        """The filtered_results list is passed verbatim to _build_email_html."""
         captured = {}
 
-        def fake_build_html(website, timestamp, total_links, non_200_results):
-            captured["non_200_results"] = non_200_results
+        def fake_build_html(website, timestamp, total_links, filtered_results, excluded_summary):
+            captured["filtered_results"] = filtered_results
             return "<p>body</p>"
 
+        filtered = [r for r in self._RESULTS if r[2] != "200"]
         with patch.object(emailer, "_RESEND_API_KEY", "key"), \
              patch.object(emailer, "_RESEND_FROM_ADDRESS", "from@example.com"), \
              patch("emailer._build_email_html", side_effect=fake_build_html), \
              patch("emailer._send_via_resend"):
             emailer.send_email_notification(
-                results=self._RESULTS,
+                filtered_results=filtered,
+                excluded_summary={},
                 website="example.com",
                 timestamp="2026-02-24T14-05-32",
-                total_links=2,
+                total_links=len(self._RESULTS),
                 notify_email="user@example.com",
             )
 
-        non_200 = captured["non_200_results"]
-        self.assertEqual(len(non_200), 1)
-        self.assertEqual(non_200[0][2], "404")
+        rows = captured["filtered_results"]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0][2], "404")
 
     # --- subject line ---
 
     def test_subject_contains_website_and_count(self):
-        """Email subject contains the website and non-200 count."""
+        """Email subject contains the website and filtered result count."""
         captured = {}
 
         def fake_send(notify_email, from_address, subject, body):
             captured["subject"] = subject
 
+        filtered = [r for r in self._RESULTS if r[2] != "200"]
         with patch.object(emailer, "_RESEND_API_KEY", "key"), \
              patch.object(emailer, "_RESEND_FROM_ADDRESS", "from@example.com"), \
              patch("emailer._send_via_resend", side_effect=fake_send):
             emailer.send_email_notification(
-                results=self._RESULTS,
+                filtered_results=filtered,
+                excluded_summary={},
                 website="example.com",
                 timestamp="2026-02-24T14-05-32",
-                total_links=2,
+                total_links=len(self._RESULTS),
                 notify_email="user@example.com",
             )
 
         subject = captured.get("subject", "")
         self.assertIn("example.com", subject)
-        self.assertIn("1", subject)  # 1 non-200 result
+        self.assertIn("1", subject)
+        self.assertIn("result(s) matching filter", subject)
 
     # --- delegates to _send_via_resend ---
 
@@ -313,7 +323,8 @@ class TestSendEmailNotification(unittest.TestCase):
              patch.object(emailer, "_RESEND_FROM_ADDRESS", "real-from@example.com"), \
              patch("emailer._send_via_resend", side_effect=fake_send):
             emailer.send_email_notification(
-                results=[],
+                filtered_results=[],
+                excluded_summary={},
                 website="example.com",
                 timestamp="2026-02-24T14-05-32",
                 total_links=0,
@@ -335,7 +346,8 @@ class TestSendEmailNotification(unittest.TestCase):
              patch.object(emailer, "_RESEND_FROM_ADDRESS", "from@example.com"), \
              patch("emailer._send_via_resend", side_effect=fake_send):
             emailer.send_email_notification(
-                results=[],
+                filtered_results=[],
+                excluded_summary={},
                 website="example.com",
                 timestamp="2026-02-24T14-05-32",
                 total_links=0,
@@ -346,29 +358,28 @@ class TestSendEmailNotification(unittest.TestCase):
 
     # --- all-200 results ---
 
-    def test_all_200_results_sends_email_with_zero_non_200_count(self):
-        """When all results are 200, the email is still sent with 0 non-200 count in subject."""
+    def test_empty_filtered_results_sends_email_with_zero_count(self):
+        """When filtered_results is empty, subject shows 0 result(s) matching filter."""
         captured = {}
 
         def fake_send(notify_email, from_address, subject, body):
             captured["subject"] = subject
 
-        all_200 = [
-            ("https://example.com/", "", "200"),
-            ("https://example.com/about", "https://example.com/", "200"),
-        ]
         with patch.object(emailer, "_RESEND_API_KEY", "key"), \
              patch.object(emailer, "_RESEND_FROM_ADDRESS", "from@example.com"), \
              patch("emailer._send_via_resend", side_effect=fake_send):
             emailer.send_email_notification(
-                results=all_200,
+                filtered_results=[],
+                excluded_summary={"200": 2},
                 website="example.com",
                 timestamp="2026-02-24T14-05-32",
                 total_links=2,
                 notify_email="user@example.com",
             )
 
-        self.assertIn("0", captured.get("subject", ""))
+        subject = captured.get("subject", "")
+        self.assertIn("0", subject)
+        self.assertIn("result(s) matching filter", subject)
 
 
 if __name__ == "__main__":
