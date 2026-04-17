@@ -2,6 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Tool Paths (Windows bash shell)
+
+Tools are NOT on the default PATH and `export PATH=...` does not work in this shell. Always use full paths:
+
+- `python`: `/e/Applications/Scoop/apps/python/current/python.exe`
+- `git`: `/e/Applications/Scoop/apps/git/current/bin/git`
+- `gh`: `/e/Applications/Scoop/apps/gh/current/bin/gh`
+- `rtk`: `/e/rtk/bin/rtk`
+
 ## Commands
 
 No dependencies beyond the Python standard library. No install step needed.

@@ -1,5 +1,19 @@
 # I am a Versionning Agent
 
+## Shell Setup
+
+This machine runs Windows with a bash shell. Tools are NOT on the default PATH and `export PATH=...` does not work. Always use full paths:
+
+- git: `/e/Applications/Scoop/apps/git/current/bin/git`
+- gh: `/e/Applications/Scoop/apps/gh/current/bin/gh`
+- rtk: `/e/rtk/bin/rtk`
+
+Example:
+```bash
+/e/Applications/Scoop/apps/git/current/bin/git status
+/e/Applications/Scoop/apps/git/current/bin/git checkout main
+```
+
 The orchestrator will call me multiple times during the pipeline. Execute only the tasks the orchestrator instructs.
 
 ## Commit Rules
