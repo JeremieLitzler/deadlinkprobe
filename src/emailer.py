@@ -10,9 +10,13 @@ _RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 _RESEND_FROM_ADDRESS = os.environ.get("RESEND_FROM_ADDRESS")
 
 
-def _build_email_rows(non_200_results: list[tuple[str, str, str]]) -> str:
+def _is_3xx(status: str) -> bool:
+    return len(status) == 3 and status.startswith("3") and status.isdigit()
+
+
+def _build_email_rows(results: list) -> str:
     rows = []
-    for link, referrer, status in non_200_results:
+    for link, referrer, status in results:
         rows.append(
             "<tr><td>{}</td><td>{}</td><td>{}</td></tr>".format(
                 html.escape(link),
@@ -23,26 +27,56 @@ def _build_email_rows(non_200_results: list[tuple[str, str, str]]) -> str:
     return "\n".join(rows)
 
 
+def _build_table_html(results: list) -> str:
+    return (
+        "<table>"
+        "<thead><tr><th>Link</th><th>Referrer</th><th>Status</th></tr></thead>"
+        "<tbody>{}</tbody>"
+        "</table>".format(_build_email_rows(results))
+    )
+
+
+def _format_excluded_item(code: str, count: int) -> str:
+    return "<li>{}: {}</li>".format(html.escape(code), count)
+
+
+def _build_excluded_summary_html(excluded_summary: dict) -> str:
+    if not excluded_summary:
+        return ""
+    items = "".join(
+        _format_excluded_item(code, count)
+        for code, count in sorted(excluded_summary.items())
+    )
+    return "<p>Excluded status codes (not in filter):</p><ul>{}</ul>".format(items)
+
+
+def _build_email_summary_lines(
+    website: str,
+    timestamp: str,
+    total_links: int,
+    filtered_count: int,
+) -> list:
+    return [
+        "<p>Website: <strong>{}</strong></p>".format(html.escape(website)),
+        "<p>Scan timestamp: {}</p>".format(html.escape(timestamp)),
+        "<p>Total links checked: {}</p>".format(total_links),
+        "<p>Results matching filter: {}</p>".format(filtered_count),
+    ]
+
+
 def _build_email_html(
     website: str,
     timestamp: str,
     total_links: int,
-    non_200_results: list[tuple[str, str, str]],
+    filtered_results: list,
+    excluded_summary: dict,
 ) -> str:
-    non_200_count = len(non_200_results)
-    lines = [
-        "<p>Website: <strong>{}</strong></p>".format(html.escape(website)),
-        "<p>Scan timestamp: {}</p>".format(html.escape(timestamp)),
-        "<p>Total links checked: {}</p>".format(total_links),
-        "<p>Non-200 results: {}</p>".format(non_200_count),
-    ]
-    if non_200_results:
-        lines.append(
-            "<table>"
-            "<thead><tr><th>Link</th><th>Referrer</th><th>Status</th></tr></thead>"
-            "<tbody>{}</tbody>"
-            "</table>".format(_build_email_rows(non_200_results))
-        )
+    lines = _build_email_summary_lines(website, timestamp, total_links, len(filtered_results))
+    excluded_html = _build_excluded_summary_html(excluded_summary)
+    if excluded_html:
+        lines.append(excluded_html)
+    if filtered_results:
+        lines.append(_build_table_html(filtered_results))
     return "\n".join(lines)
 
 
@@ -68,35 +102,30 @@ def _send_via_resend(
         )
 
 
-def _is_3xx(status: str) -> bool:
-    return len(status) == 3 and status.startswith("3") and status.isdigit()
-
-
 def send_email_notification(
-    results: list[tuple[str, str, str]],
+    filtered_results: list,
+    excluded_summary: dict,
     website: str,
     timestamp: str,
     total_links: int,
     notify_email: str,
-    include_3xx: bool = False,
 ) -> None:
     """Send an email notification with scan results via the Resend API.
 
     Parameters
     ----------
-    results:
-        Full list of (link, referrer, http_status_code) tuples.
+    filtered_results:
+        Pre-filtered list of (link, referrer, http_status_code) tuples to show in the table.
+    excluded_summary:
+        Mapping of status_code -> count for results excluded by the filter.
     website:
         The netloc of the scanned URL (used in subject and body).
     timestamp:
         The scan timestamp string (e.g. "2026-02-24T14-05-32").
     total_links:
-        Total number of links checked.
+        Total number of links checked (unfiltered count).
     notify_email:
         Recipient email address.
-    include_3xx:
-        When False (default), 3xx redirect results are excluded from the email
-        table and subject-line count. When True, they are included.
     """
     if _RESEND_API_KEY is None:
         print("Warning: RESEND_API_KEY is not set; notification skipped.", file=sys.stderr)
@@ -105,11 +134,7 @@ def send_email_notification(
         print("Warning: RESEND_FROM_ADDRESS is not set; notification skipped.", file=sys.stderr)
         return
     resend.api_key = _RESEND_API_KEY
-    non_200_results = [
-        row for row in results
-        if row[2] != "200" and (include_3xx or not _is_3xx(row[2]))
-    ]
-    non_200_count = len(non_200_results)
-    subject = "Dead link scan: {} — {} non-200 result(s)".format(website, non_200_count)
-    body = _build_email_html(website, timestamp, total_links, non_200_results)
+    filtered_count = len(filtered_results)
+    subject = "Dead link scan: {} — {} result(s) matching filter".format(website, filtered_count)
+    body = _build_email_html(website, timestamp, total_links, filtered_results, excluded_summary)
     _send_via_resend(notify_email, _RESEND_FROM_ADDRESS, subject, body)

@@ -44,13 +44,23 @@ def build_arg_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--keep-status-codes",
+        default=None,
+        metavar="CODES",
+        help=(
+            "Comma-separated HTTP status codes to include in CSV and email output. "
+            "Default: 404,500. Pass an empty string to include all codes. "
+            "ERROR:* results are always included regardless of this setting."
+        ),
+    )
+    parser.add_argument(
         "--include-3xx-status-code",
         action="store_true",
         default=False,
         help=(
-            "Include 3xx redirect results in the email notification table. "
-            "By default, 3xx results are excluded from the email (but still appear in the CSV). "
-            "Has no effect when --notify-email is absent."
+            "[DEPRECATED] Use --keep-status-codes instead. "
+            "When supplied without --keep-status-codes, adds 3xx redirect codes to the "
+            "default filter (404,500). Has no effect when --keep-status-codes is also provided."
         ),
     )
     return parser

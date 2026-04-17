@@ -12,23 +12,39 @@ import crawler
 import emailer
 import fetcher
 import reporter
+import status_filter as status_filter_module
+
+
+def _build_filter(args) -> status_filter_module.StatusFilter:
+    include_3xx_compat = False
+    if args.include_3xx_status_code:
+        print(
+            "Warning: --include-3xx-status-code is deprecated; use --keep-status-codes instead.",
+            file=sys.stderr,
+        )
+        if args.keep_status_codes is None:
+            include_3xx_compat = True
+    codes_raw = args.keep_status_codes or "404,500"
+    return status_filter_module.build_filter(codes_raw, include_3xx_compat)
 
 
 def _maybe_send_notification(
     args,
-    results: list[tuple[str, str, str]],
+    filtered_results: list,
+    excluded_summary: dict,
+    total_links: int,
     website: str,
     scan_timestamp: str,
 ) -> None:
     if args.notify_email is None:
         return
     emailer.send_email_notification(
-        results,
+        filtered_results,
+        excluded_summary,
         website,
         scan_timestamp,
-        len(results),
+        total_links,
         args.notify_email,
-        args.include_3xx_status_code,
     )
 
 
@@ -72,26 +88,28 @@ def main() -> None:
 
     results.sort(key=lambda row: (row[1], row[0]))
 
+    result_filter = _build_filter(args)
+    filtered = [r for r in results if result_filter.matches(r[2])]
+    excluded = result_filter.excluded_summary(results)
+
     if args.output is not None:
-        # Legacy mode: flat CSV only, no README.md
         csv_path = args.output
         md_path = None
     else:
-        # Scan-folder mode
         website = parsed.netloc.replace(":", "_")
         scan_dir = os.path.join("scans", website, scan_timestamp)
         os.makedirs(scan_dir, exist_ok=True)
         csv_path = os.path.join(scan_dir, "results.csv")
         md_path = os.path.join(scan_dir, "README.md")
 
-    reporter.write_csv(results, csv_path)
+    reporter.write_csv(filtered, csv_path)
 
     if md_path is not None:
-        reporter.write_markdown_summary(results, md_path, scan_timestamp)
+        reporter.write_markdown_summary(filtered, md_path, scan_timestamp)
 
     print(f"Checked {len(results)} links. Results written to {csv_path}.")
 
-    _maybe_send_notification(args, results, parsed.netloc, scan_timestamp)
+    _maybe_send_notification(args, filtered, excluded, len(results), parsed.netloc, scan_timestamp)
 
 
 if __name__ == "__main__":

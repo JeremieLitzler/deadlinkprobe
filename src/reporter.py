@@ -44,13 +44,12 @@ def write_markdown_summary(
 
     Prints an error to stderr and exits with code 1 if the file cannot be opened.
     """
-    non_200 = [row for row in results if row[2] != "200"]
     try:
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(f"## {timestamp}\n\n")
             f.write("| URL | Referrer | HTTP Status |\n")
             f.write("|---|---|---|\n")
-            for link, referrer, status in non_200:
+            for link, referrer, status in results:
                 f.write(f"| {link} | {referrer} | {status} |\n")
     except OSError as e:
         print(f"Error: cannot write to '{output_path}': {e}", file=sys.stderr)
