@@ -96,9 +96,9 @@ class TestBuildArgParser(unittest.TestCase):
     # --- --user-agent ---
 
     def test_user_agent_default(self):
-        """--user-agent defaults to 'deadlinkchecker/1.0'."""
+        """--user-agent defaults to 'linkprobe/1.0'."""
         args = self._parse(["https://example.com/"])
-        self.assertEqual(args.user_agent, "deadlinkchecker/1.0")
+        self.assertEqual(args.user_agent, "linkprobe/1.0")
 
     def test_user_agent_custom(self):
         """--user-agent stores the provided string."""

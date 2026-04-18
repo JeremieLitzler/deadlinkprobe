@@ -6,13 +6,14 @@ Add filter to keep status code in report
 
 ## Source
 
-GitHub Issue: https://github.com/JeremieLitzler/deadlinkchecker/issues/39
+GitHub Issue: https://github.com/JeremieLitzler/linkprobe/issues/39
 
 ## Description
 
 Add a new CLI parameter to filter which HTTP status codes appear in the report output.
 
 Key requirements:
+
 - New parameter with default values of `404,500`
 - CSV output includes only rows whose status code matches the parameter values
 - Email reports display count summaries of status codes excluded from the parameter

@@ -31,8 +31,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--user-agent",
-        default="deadlinkchecker/1.0",
-        help="User-Agent header sent with every request. (default: deadlinkchecker/1.0)",
+        default="linkprobe/1.0",
+        help="User-Agent header sent with every request. (default: linkprobe/1.0)",
     )
     parser.add_argument(
         "--notify-email",

@@ -23,7 +23,7 @@ Scope is limited to HTTP and HTTPS schemes. No authentication, no JavaScript ren
 ### Files to Create
 
 ```
-deadlinkchecker/
+linkprobe/
 ├── checker.py          # Entry point + CLI argument parsing
 ├── crawler.py          # BFS crawl logic; produces link/referrer pairs
 ├── fetcher.py          # HTTP HEAD/GET requests; returns status or error string
@@ -48,13 +48,13 @@ The tool is invoked directly. No `setup.py` or `pip install` is required at this
 
 ### Arguments
 
-| Argument           | Type           | Required | Default               | Description                                  |
-| ------------------ | -------------- | -------- | --------------------- | -------------------------------------------- |
-| `start_url`        | positional str | Yes      | —                     | The URL to begin crawling from.              |
-| `--output` / `-o`  | str            | No       | `results.csv`         | Path to the output CSV file.                 |
-| `--workers` / `-w` | int            | No       | `10`                  | Number of threads in the ThreadPoolExecutor. |
-| `--timeout` / `-t` | int            | No       | `10`                  | Per-request timeout in seconds.              |
-| `--user-agent`     | str            | No       | `deadlinkchecker/1.0` | User-Agent header sent with every request.   |
+| Argument           | Type           | Required | Default         | Description                                  |
+| ------------------ | -------------- | -------- | --------------- | -------------------------------------------- |
+| `start_url`        | positional str | Yes      | —               | The URL to begin crawling from.              |
+| `--output` / `-o`  | str            | No       | `results.csv`   | Path to the output CSV file.                 |
+| `--workers` / `-w` | int            | No       | `10`            | Number of threads in the ThreadPoolExecutor. |
+| `--timeout` / `-t` | int            | No       | `10`            | Per-request timeout in seconds.              |
+| `--user-agent`     | str            | No       | `linkprobe/1.0` | User-Agent header sent with every request.   |
 
 ### Example
 
@@ -281,18 +281,18 @@ Thread safety note: `crawler.crawl` runs single-threaded (BFS). Parallelism appl
 
 ## Expected Output Example
 
-From the sample site `https://deadlinkchecker-sample-website.netlify.app`:
+From the sample site `https://linkprobe-sample-website.netlify.app`:
 
 ```csv
 link,referrer,http_status_code
-https://deadlinkchecker-sample-website.netlify.app/about/,https://deadlinkchecker-sample-website.netlify.app/,404
-https://deadlinkchecker-sample-website.netlify.app/blog,https://deadlinkchecker-sample-website.netlify.app/,200
-https://deadlinkchecker-sample-website.netlify.app/contact,https://deadlinkchecker-sample-website.netlify.app/,200
-https://iamjeremie.me/,https://deadlinkchecker-sample-website.netlify.app/contact,200
-https://iamjeremie.me/doesnt-exist,https://deadlinkchecker-sample-website.netlify.app/contact,404
+https://linkprobe-sample-website.netlify.app/about/,https://linkprobe-sample-website.netlify.app/,404
+https://linkprobe-sample-website.netlify.app/blog,https://linkprobe-sample-website.netlify.app/,200
+https://linkprobe-sample-website.netlify.app/contact,https://linkprobe-sample-website.netlify.app/,200
+https://iamjeremie.me/,https://linkprobe-sample-website.netlify.app/contact,200
+https://iamjeremie.me/doesnt-exist,https://linkprobe-sample-website.netlify.app/contact,404
 ```
 
-Note: the start URL itself (`https://deadlinkchecker-sample-website.netlify.app/`) does not appear in the output because its referrer is `""` and none of the other crawled pages link back to it as a new discovery. If the start URL is discovered as a link from another page before being placed into `visited`, it will appear with the appropriate referrer. The first insertion always uses `""` as referrer.
+Note: the start URL itself (`https://linkprobe-sample-website.netlify.app/`) does not appear in the output because its referrer is `""` and none of the other crawled pages link back to it as a new discovery. If the start URL is discovered as a link from another page before being placed into `visited`, it will appear with the appropriate referrer. The first insertion always uses `""` as referrer.
 
 ## Summary of Key Design Decisions
 
@@ -468,6 +468,7 @@ Behaviour:
 #### `checker.py` — changes to `main()`
 
 1. Change the `--output` / `-o` argument:
+
    - `default` changes from `"results.csv"` to `None`.
    - Help text updated to reflect new behaviour.
 
@@ -645,15 +646,15 @@ jobs:
 
 ### Goal and Scope
 
-The `deadlinkchecker.yml` GitHub Actions workflow commits scan CSV results and pushes them directly to `main`. A `protect-main` branch ruleset (ruleset id 13171940) now enforces that all writes to the default branch must go through a pull request. The `github-actions[bot]` is not a bypass actor, so the `git push` step fails with a ruleset violation.
+The `linkprobe.yml` GitHub Actions workflow commits scan CSV results and pushes them directly to `main`. A `protect-main` branch ruleset (ruleset id 13171940) now enforces that all writes to the default branch must go through a pull request. The `github-actions[bot]` is not a bypass actor, so the `git push` step fails with a ruleset violation.
 
 The fix is to redirect the push to a dedicated data branch (`data/scans`) that is not the default branch and therefore not subject to the `protect-main` ruleset.
 
-Scope is limited to a single file: `.github/workflows/deadlinkchecker.yml`. No source code, tests, or other workflow files require changes.
+Scope is limited to a single file: `.github/workflows/linkprobe.yml`. No source code, tests, or other workflow files require changes.
 
 ### File to Modify
 
-`.github/workflows/deadlinkchecker.yml`
+`.github/workflows/linkprobe.yml`
 
 ### Exact Changes Required
 
@@ -873,13 +874,13 @@ Must be created at the repository root. It declares `resend` as a dependency so 
 
 The following outcomes must hold exactly as they do today:
 
-| Scenario | Observable outcome |
-| --- | --- |
-| Both env vars set, API call succeeds | Prints `Notification sent.` to stdout |
-| `RESEND_API_KEY` not set | Prints warning to stderr; returns without sending |
-| `RESEND_FROM_ADDRESS` not set | Prints warning to stderr; returns without sending |
-| API call returns an HTTP error | Prints warning with HTTP status to stderr |
-| API call raises a network-level error | Prints warning with error description to stderr |
+| Scenario                              | Observable outcome                                |
+| ------------------------------------- | ------------------------------------------------- |
+| Both env vars set, API call succeeds  | Prints `Notification sent.` to stdout             |
+| `RESEND_API_KEY` not set              | Prints warning to stderr; returns without sending |
+| `RESEND_FROM_ADDRESS` not set         | Prints warning to stderr; returns without sending |
+| API call returns an HTTP error        | Prints warning with HTTP status to stderr         |
+| API call raises a network-level error | Prints warning with error description to stderr   |
 
 In all failure cases the tool exits with code 0 and scan results on disk are unaffected.
 
@@ -887,11 +888,11 @@ The email subject, HTML body structure, and recipient are built the same way as 
 
 ### Edge Cases
 
-| Scenario | Behaviour |
-| --- | --- |
-| `resend` package is not installed | Tool fails at import time with a standard `ModuleNotFoundError`; no special handling required |
-| SDK raises an exception on send | Caught and surfaced as a warning to stderr; tool exits 0 |
-| `RESEND_API_URL` still present in the environment | Has no effect; the module no longer reads or uses it |
+| Scenario                                          | Behaviour                                                                                     |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `resend` package is not installed                 | Tool fails at import time with a standard `ModuleNotFoundError`; no special handling required |
+| SDK raises an exception on send                   | Caught and surfaced as a warning to stderr; tool exits 0                                      |
+| `RESEND_API_URL` still present in the environment | Has no effect; the module no longer reads or uses it                                          |
 
 ### Constraints
 
