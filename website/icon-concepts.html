@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>linkprobe — icon concepts</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .icon-card {
+      background-color: #161b27;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .icon-card:hover {
+      border-color: rgba(34, 211, 238, 0.3);
+      box-shadow: 0 0 40px rgba(34, 211, 238, 0.08);
+    }
+    .size-row {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 1rem;
+      background-color: #0d1117;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    /* radar sweep animation for concept C */
+    @keyframes radar-sweep {
+      0%   { transform: rotate(0deg);   opacity: 0.35; }
+      100% { transform: rotate(360deg); opacity: 0.35; }
+    }
+    .radar-sweep {
+      transform-box: fill-box;
+      transform-origin: 48px 48px;
+      animation: radar-sweep 3.5s linear infinite;
+    }
+  </style>
+</head>
+<body class="bg-[#0d1117] text-slate-200 antialiased min-h-screen">
+
+  <div class="max-w-6xl mx-auto px-6 py-16">
+
+    <header class="text-center mb-14">
+      <h1 class="text-3xl sm:text-4xl font-bold mb-3">Icon concepts</h1>
+      <p class="text-slate-400 max-w-xl mx-auto leading-relaxed">
+        Four directions for the <span class="font-mono text-cyan-400">linkprobe</span> icon.
+        Each below is shown at 96px (hero), 32px (favicon-large), and 16px (tab favicon).
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+      <!-- ══════════════ CONCEPT A: INSPECTOR ══════════════ -->
+      <div class="icon-card">
+        <div class="flex flex-col items-center text-center">
+
+          <!-- Big icon -->
+          <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-6">
+            <circle cx="48" cy="48" r="46" fill="#161b27"/>
+            <circle cx="48" cy="48" r="44" stroke="#22d3ee" stroke-width="0.5" stroke-dasharray="3 5" opacity="0.25"/>
+            <!-- handle (draw first so lens overlaps) -->
+            <line x1="58" y1="58" x2="80" y2="80" stroke="#22d3ee" stroke-width="5.5" stroke-linecap="round"/>
+            <line x1="64" y1="64" x2="78" y2="78" stroke="#0d1117" stroke-width="1" stroke-linecap="round" opacity="0.3"/>
+            <!-- lens -->
+            <circle cx="38" cy="38" r="24" fill="#0d1117" stroke="#22d3ee" stroke-width="3.5"/>
+            <!-- chain inside -->
+            <rect x="16" y="33" width="22" height="10" rx="5" fill="#0d1117" stroke="#22d3ee" stroke-width="2"/>
+            <rect x="32" y="33" width="22" height="10" rx="5" fill="#0d1117" stroke="#22d3ee" stroke-width="2"/>
+          </svg>
+
+          <h2 class="font-mono font-bold text-xl mb-1">A · Inspector</h2>
+          <p class="text-cyan-400/80 text-xs font-mono uppercase tracking-widest mb-4">Search · Check · Verify</p>
+          <p class="text-slate-400 text-sm leading-relaxed mb-6">
+            A magnifying glass with a chain link inside the lens.
+            Universal "inspection" language — anyone reads it as "check links".
+            Survives well at tiny sizes because the silhouette (circle + handle) is unmistakable.
+          </p>
+
+          <div class="w-full space-y-3 text-left">
+            <div class="size-row">
+              <svg width="32" height="32" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="48" cy="48" r="46" fill="#161b27"/>
+                <line x1="58" y1="58" x2="80" y2="80" stroke="#22d3ee" stroke-width="7" stroke-linecap="round"/>
+                <circle cx="38" cy="38" r="24" fill="#0d1117" stroke="#22d3ee" stroke-width="4"/>
+                <rect x="16" y="33" width="22" height="10" rx="5" fill="#0d1117" stroke="#22d3ee" stroke-width="2.5"/>
+                <rect x="32" y="33" width="22" height="10" rx="5" fill="#0d1117" stroke="#22d3ee" stroke-width="2.5"/>
+              </svg>
+              <span class="text-slate-500 font-mono text-xs">32px</span>
+            </div>
+            <div class="size-row">
+              <svg width="16" height="16" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="48" cy="48" r="46" fill="#161b27"/>
+                <line x1="58" y1="58" x2="80" y2="80" stroke="#22d3ee" stroke-width="9" stroke-linecap="round"/>
+                <circle cx="38" cy="38" r="24" fill="#0d1117" stroke="#22d3ee" stroke-width="6"/>
+                <rect x="18" y="32" width="40" height="12" rx="6" fill="none" stroke="#22d3ee" stroke-width="4"/>
+              </svg>
+              <span class="text-slate-500 font-mono text-xs">16px (simplified)</span>
+            </div>
+          </div>
+
+          <div class="mt-5 pt-5 border-t border-slate-800 w-full text-left space-y-1.5">
+            <p class="text-xs"><span class="text-green-400">✓</span> <span class="text-slate-400">Most universally recognised metaphor</span></p>
+            <p class="text-xs"><span class="text-green-400">✓</span> <span class="text-slate-400">Works at every size</span></p>
+            <p class="text-xs"><span class="text-yellow-400">—</span> <span class="text-slate-400">Slightly generic (similar to search apps)</span></p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════════════ CONCEPT B: DIAGNOSIS ══════════════ -->
+      <div class="icon-card">
+        <div class="flex flex-col items-center text-center">
+
+          <!-- Big icon -->
+          <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-6">
+            <circle cx="48" cy="48" r="46" fill="#161b27"/>
+            <circle cx="48" cy="48" r="44" stroke="#22d3ee" stroke-width="0.5" stroke-dasharray="3 5" opacity="0.25"/>
+
+            <!-- Left link: intact, cyan -->
+            <rect x="6" y="37" width="46" height="22" rx="11" fill="#161b27" stroke="#22d3ee" stroke-width="2.75"/>
+
+            <!-- Right link: broken — two arcs with a gap at top-middle -->
+            <!-- left-lower quadrant of right link -->
+            <path d="M 51,48 a11,11 0 0 1 11,-11" stroke="#f85149" stroke-width="2.75" fill="none" stroke-linecap="round"/>
+            <!-- top of right link split into 2 halves -->
+            <path d="M 62,37 L 66,37" stroke="#f85149" stroke-width="2.75" stroke-linecap="round"/>
+            <path d="M 74,37 L 79,37" stroke="#f85149" stroke-width="2.75" stroke-linecap="round"/>
+            <!-- right side arc + bottom -->
+            <path d="M 79,37 a11,11 0 0 1 11,11 a11,11 0 0 1 -11,11 L 62,59 a11,11 0 0 1 -11,-11" stroke="#f85149" stroke-width="2.75" fill="none" stroke-linecap="round"/>
+
+            <!-- spark/crack zigzags in the gap -->
+            <path d="M 68,32 L 69.5,35 L 68.5,38 L 70,41" stroke="#f85149" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <path d="M 72,32 L 70.5,35 L 71.5,38 L 70,41" stroke="#f85149" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          </svg>
+
+          <h2 class="font-mono font-bold text-xl mb-1">B · Diagnosis</h2>
+          <p class="text-cyan-400/80 text-xs font-mono uppercase tracking-widest mb-4">Healthy · Broken · Detected</p>
+          <p class="text-slate-400 text-sm leading-relaxed mb-6">
+            A chain where one ring is intact (cyan) and the other has a visible crack (red).
+            Shows the app's literal outcome: it finds broken links. Strongest narrative of the three —
+            you don't have to explain it.
+          </p>
+
+          <div class="w-full space-y-3 text-left">
+            <div class="size-row">
+              <svg width="32" height="32" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="48" cy="48" r="46" fill="#161b27"/>
+                <rect x="6" y="37" width="46" height="22" rx="11" fill="#161b27" stroke="#22d3ee" stroke-width="3.5"/>
+                <path d="M 51,48 a11,11 0 0 1 11,-11 L 66,37" stroke="#f85149" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                <path d="M 74,37 L 79,37 a11,11 0 0 1 11,11 a11,11 0 0 1 -11,11 L 62,59 a11,11 0 0 1 -11,-11" stroke="#f85149" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+              </svg>
+              <span class="text-slate-500 font-mono text-xs">32px</span>
+            </div>
+            <div class="size-row">
+              <svg width="16" height="16" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="48" cy="48" r="46" fill="#161b27"/>
+                <rect x="6" y="37" width="46" height="22" rx="11" fill="#161b27" stroke="#22d3ee" stroke-width="5"/>
+                <path d="M 51,48 a11,11 0 0 1 11,-11 L 66,37" stroke="#f85149" stroke-width="5" fill="none" stroke-linecap="round"/>
+                <path d="M 74,37 L 79,37 a11,11 0 0 1 11,11 a11,11 0 0 1 -11,11 L 62,59 a11,11 0 0 1 -11,-11" stroke="#f85149" stroke-width="5" fill="none" stroke-linecap="round"/>
+              </svg>
+              <span class="text-slate-500 font-mono text-xs">16px</span>
+            </div>
+          </div>
+
+          <div class="mt-5 pt-5 border-t border-slate-800 w-full text-left space-y-1.5">
+            <p class="text-xs"><span class="text-green-400">✓</span> <span class="text-slate-400">Strongest narrative — "finds broken links"</span></p>
+            <p class="text-xs"><span class="text-green-400">✓</span> <span class="text-slate-400">Two-colour story (healthy vs broken)</span></p>
+            <p class="text-xs"><span class="text-yellow-400">—</span> <span class="text-slate-400">Detail loss at 16px; crack reads as noise</span></p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════════════ CONCEPT C: PROBE (RADAR) ══════════════ -->
+      <div class="icon-card">
+        <div class="flex flex-col items-center text-center">
+
+          <!-- Big icon -->
+          <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-6">
+            <circle cx="48" cy="48" r="46" fill="#161b27"/>
+
+            <!-- Radar rings -->
+            <circle cx="48" cy="48" r="42" stroke="#22d3ee" stroke-width="0.5" opacity="0.15"/>
+            <circle cx="48" cy="48" r="32" stroke="#22d3ee" stroke-width="0.5" opacity="0.25"/>
+            <circle cx="48" cy="48" r="22" stroke="#22d3ee" stroke-width="0.5" opacity="0.35"/>
+
+            <!-- Radar sweep beam (animated) -->
+            <path d="M 48,48 L 90,48 A 42,42 0 0 1 78,78 Z" fill="url(#sweepGrad)" class="radar-sweep"/>
+            <defs>
+              <linearGradient id="sweepGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%"   stop-color="#22d3ee" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Crosshairs -->
+            <line x1="48" y1="6"  x2="48" y2="16" stroke="#22d3ee" stroke-width="0.75" opacity="0.6"/>
+            <line x1="48" y1="80" x2="48" y2="90" stroke="#22d3ee" stroke-width="0.75" opacity="0.6"/>
+            <line x1="6"  y1="48" x2="16" y2="48" stroke="#22d3ee" stroke-width="0.75" opacity="0.6"/>
+            <line x1="80" y1="48" x2="90" y2="48" stroke="#22d3ee" stroke-width="0.75" opacity="0.6"/>
+
+            <!-- Detected "link" dots with statuses -->
+            <circle cx="22" cy="26" r="2.2" fill="#22d3ee"/>
+            <circle cx="74" cy="22" r="2.2" fill="#3fb950"/>
+            <circle cx="78" cy="66" r="2.2" fill="#f85149"/>
+            <circle cx="26" cy="72" r="2.2" fill="#22d3ee"/>
+
+            <!-- Chain link at centre -->
+            <rect x="20" y="40" width="30" height="16" rx="8" fill="#161b27" stroke="#22d3ee" stroke-width="2.25"/>
+            <rect x="46" y="40" width="30" height="16" rx="8" fill="#161b27" stroke="#22d3ee" stroke-width="2.25"/>
+          </svg>
+
+          <h2 class="font-mono font-bold text-xl mb-1">C · Probe</h2>
+          <p class="text-cyan-400/80 text-xs font-mono uppercase tracking-widest mb-4">Scan · Sweep · Discover</p>
+          <p class="text-slate-400 text-sm leading-relaxed mb-6">
+            A radar scope sweeping over a chain link, with dots marking discovered links (cyan/green/red = status).
+            Leans into the "probe" in the name. Most distinctive of the three — and animates naturally.
+          </p>
+
+          <div class="w-full space-y-3 text-left">
+            <div class="size-row">
+              <svg width="32" height="32" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="48" cy="48" r="46" fill="#161b27"/>
+                <circle cx="48" cy="48" r="32" stroke="#22d3ee" stroke-width="0.75" opacity="0.3"/>
+                <circle cx="48" cy="48" r="22" stroke="#22d3ee" stroke-width="0.75" opacity="0.45"/>
+                <circle cx="74" cy="22" r="2.8" fill="#3fb950"/>
+                <circle cx="78" cy="66" r="2.8" fill="#f85149"/>
+                <rect x="20" y="40" width="30" height="16" rx="8" fill="#161b27" stroke="#22d3ee" stroke-width="3"/>
+                <rect x="46" y="40" width="30" height="16" rx="8" fill="#161b27" stroke="#22d3ee" stroke-width="3"/>
+              </svg>
+              <span class="text-slate-500 font-mono text-xs">32px</span>
+            </div>
+            <div class="size-row">
+              <svg width="16" height="16" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="48" cy="48" r="46" fill="#161b27"/>
+                <circle cx="48" cy="48" r="36" stroke="#22d3ee" stroke-width="2" opacity="0.5"/>
+                <rect x="18" y="38" width="34" height="20" rx="10" fill="#161b27" stroke="#22d3ee" stroke-width="4.5"/>
+                <rect x="44" y="38" width="34" height="20" rx="10" fill="#161b27" stroke="#22d3ee" stroke-width="4.5"/>
+              </svg>
+              <span class="text-slate-500 font-mono text-xs">16px (simplified)</span>
+            </div>
+          </div>
+
+          <div class="mt-5 pt-5 border-t border-slate-800 w-full text-left space-y-1.5">
+            <p class="text-xs"><span class="text-green-400">✓</span> <span class="text-slate-400">Most distinctive, on-brand for "probe"</span></p>
+            <p class="text-xs"><span class="text-green-400">✓</span> <span class="text-slate-400">Animates well at hero size</span></p>
+            <p class="text-xs"><span class="text-yellow-400">—</span> <span class="text-slate-400">Busy; needs heavy simplification at 16px</span></p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════════════ CONCEPT D: DETECTIVE (A + B) ══════════════ -->
+      <div class="icon-card">
+        <div class="flex flex-col items-center text-center">
+
+          <!-- Big icon -->
+          <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-6">
+            <circle cx="48" cy="48" r="46" fill="#161b27"/>
+            <circle cx="48" cy="48" r="44" stroke="#22d3ee" stroke-width="0.5" stroke-dasharray="3 5" opacity="0.25"/>
+            <!-- Handle (drawn first so lens overlaps it) -->
+            <line x1="58" y1="58" x2="80" y2="80" stroke="#22d3ee" stroke-width="5.5" stroke-linecap="round"/>
+            <line x1="64" y1="64" x2="78" y2="78" stroke="#0d1117" stroke-width="1" stroke-linecap="round" opacity="0.3"/>
+            <!-- Lens -->
+            <circle cx="38" cy="38" r="24" fill="#0d1117" stroke="#22d3ee" stroke-width="3.5"/>
+            <!-- Right pill: BROKEN, red (drawn first so left overlaps on top) -->
+            <rect x="34" y="32" width="24" height="12" rx="6" fill="#0d1117" stroke="#f85149" stroke-width="2"/>
+            <!-- Break: cover top-middle + spark lines -->
+            <rect x="48" y="30" width="4" height="3.5" fill="#0d1117"/>
+            <path d="M 48,32 l 1,1.5 l -0.5,1.5" stroke="#f85149" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <path d="M 51,32 l -1,1.5 l 0.5,1.5" stroke="#f85149" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <!-- Left pill: INTACT, cyan (drawn last, covers overlap) -->
+            <rect x="18" y="32" width="24" height="12" rx="6" fill="#0d1117" stroke="#22d3ee" stroke-width="2"/>
+          </svg>
+
+          <h2 class="font-mono font-bold text-xl mb-1">D · Detective</h2>
+          <p class="text-cyan-400/80 text-xs font-mono uppercase tracking-widest mb-4">Inspect · Identify · Resolve</p>
+          <p class="text-slate-400 text-sm leading-relaxed mb-6">
+            A's magnifying glass meets B's healthy/broken chain — inside the lens.
+            The icon shows both the action (inspecting) and the outcome (one link is broken).
+            Tells the full story of the tool in a single glance.
+          </p>
+
+          <div class="w-full space-y-3 text-left">
+            <div class="size-row">
+              <svg width="32" height="32" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="48" cy="48" r="46" fill="#161b27"/>
+                <line x1="58" y1="58" x2="80" y2="80" stroke="#22d3ee" stroke-width="7" stroke-linecap="round"/>
+                <circle cx="38" cy="38" r="24" fill="#0d1117" stroke="#22d3ee" stroke-width="4"/>
+                <rect x="34" y="32" width="24" height="12" rx="6" fill="#0d1117" stroke="#f85149" stroke-width="2.5"/>
+                <rect x="18" y="32" width="24" height="12" rx="6" fill="#0d1117" stroke="#22d3ee" stroke-width="2.5"/>
+              </svg>
+              <span class="text-slate-500 font-mono text-xs">32px</span>
+            </div>
+            <div class="size-row">
+              <svg width="16" height="16" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="48" cy="48" r="46" fill="#161b27"/>
+                <line x1="58" y1="58" x2="80" y2="80" stroke="#22d3ee" stroke-width="9" stroke-linecap="round"/>
+                <circle cx="38" cy="38" r="24" fill="#0d1117" stroke="#22d3ee" stroke-width="5.5"/>
+                <rect x="34" y="32" width="22" height="12" rx="6" fill="#0d1117" stroke="#f85149" stroke-width="3.5"/>
+                <rect x="20" y="32" width="22" height="12" rx="6" fill="#0d1117" stroke="#22d3ee" stroke-width="3.5"/>
+              </svg>
+              <span class="text-slate-500 font-mono text-xs">16px (simplified)</span>
+            </div>
+          </div>
+
+          <div class="mt-5 pt-5 border-t border-slate-800 w-full text-left space-y-1.5">
+            <p class="text-xs"><span class="text-green-400">✓</span> <span class="text-slate-400">Complete story: action + outcome together</span></p>
+            <p class="text-xs"><span class="text-green-400">✓</span> <span class="text-slate-400">Inherits B's two-colour contrast</span></p>
+            <p class="text-xs"><span class="text-yellow-400">—</span> <span class="text-slate-400">Densest of the four; crack detail lost &lt; 24px</span></p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="mt-16 p-6 border border-slate-800 rounded-xl bg-[#161b27]/40">
+      <h3 class="font-semibold text-white mb-3">My recommendation</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">
+        <span class="text-cyan-400 font-mono">D · Detective</span> is now the strongest pick —
+        it combines A's universally-readable inspection metaphor with B's healthy/broken colour story,
+        so a new viewer sees both <em>what the app does</em> (inspect) and <em>what it finds</em> (a broken link) in one glance.
+        Use <span class="text-cyan-400 font-mono">B · Diagnosis</span> if you want a purer, cleaner 16px favicon;
+        <span class="text-cyan-400 font-mono">A · Inspector</span> as the safe fallback;
+        <span class="text-cyan-400 font-mono">C · Probe</span> for a hero or loading-state animation.
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>

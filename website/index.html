@@ -1,0 +1,982 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="linkprobe — A Python CLI tool to detect broken links on any website. Crawls internal pages recursively, checks every URL in parallel, and outputs a CSV report."
+    />
+    <title>linkprobe — Find broken links before your users do</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-[#0d1117] text-slate-200 antialiased">
+    <!-- ─────────────────── NAV ─────────────────── -->
+    <nav
+      class="fixed top-0 inset-x-0 z-50 border-b border-slate-800/50 backdrop-blur-md bg-[#0d1117]/80"
+    >
+      <div
+        class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between"
+      >
+        <a href="#" class="flex items-center gap-2.5 group">
+          <img
+            src="icon-c-probe.svg"
+            width="26"
+            height="26"
+            alt="linkprobe logo"
+            aria-hidden="true"
+          />
+          <span
+            class="font-mono font-bold text-base tracking-tight group-hover:opacity-80 transition-opacity"
+          >
+            <span class="text-cyan-400">link</span>probe
+          </span>
+        </a>
+        <div class="flex items-center gap-6">
+          <div class="hidden sm:flex items-center gap-5 text-sm text-slate-400">
+            <a
+              href="#terminal-example"
+              class="hover:text-white transition-colors"
+              >Example</a
+            >
+            <a href="#features" class="hover:text-white transition-colors"
+              >Features</a
+            >
+            <a href="#how-it-works" class="hover:text-white transition-colors"
+              >How it works</a
+            >
+            <a href="#quick-start" class="hover:text-white transition-colors"
+              >Quick start</a
+            >
+            <a href="#options" class="hover:text-white transition-colors"
+              >Options</a
+            >
+          </div>
+          <a
+            href="https://github.com/JeremieLitzler/linkprobe"
+            target="_blank"
+            rel="noopener"
+            class="flex items-center gap-1.5 text-sm text-slate-300 hover:text-white border border-slate-700 hover:border-slate-500 rounded-lg px-3 py-1.5 transition-colors"
+          >
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
+              />
+            </svg>
+            GitHub
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <!-- ─────────────────── HERO ─────────────────── -->
+      <section
+        id="hero"
+        class="relative pt-36 pb-28 px-6 flex flex-col items-center text-center overflow-hidden"
+      >
+        <!-- Logo -->
+        <div class="relative mb-8">
+          <img
+            src="icon-c-probe.svg"
+            width="100"
+            height="100"
+            alt="linkprobe logo"
+          />
+        </div>
+
+        <h1
+          class="font-mono text-6xl sm:text-7xl md:text-8xl font-bold tracking-tight mb-5"
+        >
+          <span class="text-cyan-400">link</span>probe
+        </h1>
+
+        <div class="flex flex-wrap gap-2 justify-center mb-6">
+          <span class="badge">v1.2.1</span>
+          <span class="badge">Python 3.10+</span>
+          <span class="badge">MIT</span>
+        </div>
+
+        <p class="text-xl sm:text-2xl text-slate-300 font-medium max-w-xl mb-3">
+          Find broken links before your users do.
+        </p>
+        <p class="text-slate-500 max-w-lg mb-12 leading-relaxed">
+          A CLI tool that recursively crawls your site, checks every URL in
+          parallel, and exports a clean CSV report — with optional email alerts.
+        </p>
+
+        <div class="flex flex-wrap gap-4 justify-center mb-20">
+          <a
+            href="https://github.com/JeremieLitzler/linkprobe"
+            target="_blank"
+            rel="noopener"
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-cyan-400 text-[#0d1117] font-semibold hover:bg-cyan-300 transition-colors text-sm"
+          >
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
+              />
+            </svg>
+            View on GitHub
+          </a>
+          <a
+            href="#terminal-example"
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-slate-700 text-slate-300 hover:border-slate-500 hover:text-white transition-colors text-sm"
+          >
+            View Example ↓
+          </a>
+        </div>
+
+        <!-- Terminal preview -->
+        <article id="terminal-example" class="py-24 px-6">
+          <div class="terminal w-full max-w-2xl text-left ">
+            <div class="terminal-bar">
+              <span class="dot bg-[#ff5f57]"></span>
+              <span class="dot bg-[#febc2e]"></span>
+              <span class="dot bg-[#28c840]"></span>
+              <span class="ml-3 font-mono text-xs text-slate-500">bash</span>
+            </div>
+            <div class="p-5 font-mono text-sm leading-relaxed">
+              <div class="text-slate-500">
+                $ python src/checker.py https://example.com --workers 20
+              </div>
+              <div class="mt-3 space-y-0.5">
+                <div class="text-cyan-400">[Crawling] https://example.com/</div>
+                <div class="text-cyan-400">
+                  [Crawling] https://example.com/about/
+                </div>
+                <div class="text-cyan-400">
+                  [Crawling] https://example.com/blog/
+                </div>
+                <div class="text-cyan-400">
+                  [Crawling] https://example.com/contact/
+                </div>
+                <div class="text-slate-500 text-xs mt-1">
+                  5 pages crawled · 47 links found. Checking statuses…
+                </div>
+              </div>
+              <div class="mt-3 space-y-0.5">
+                <div>
+                  <span class="text-green-400">[200]</span>
+                  <span class="text-slate-400">https://example.com/about/</span>
+                </div>
+                <div>
+                  <span class="text-red-400">[404]</span>
+                  <span class="text-slate-300"
+                    >https://example.com/old-page/</span
+                  >
+                  <span class="text-red-400/60 text-xs">← broken</span>
+                </div>
+                <div>
+                  <span class="text-yellow-400">[301]</span>
+                  <span class="text-slate-400"
+                    >https://example.com/redirect</span
+                  >
+                </div>
+                <div>
+                  <span class="text-green-400">[200]</span>
+                  <span class="text-slate-400"
+                    >https://external.com/resource</span
+                  >
+                </div>
+                <div>
+                  <span class="text-red-400">[500]</span>
+                  <span class="text-slate-300"
+                    >https://api.example.com/data</span
+                  >
+                  <span class="text-red-400/60 text-xs">← broken</span>
+                </div>
+              </div>
+              <div class="mt-4">
+                <span class="text-slate-400">Results → </span>
+                <span class="text-cyan-400/80"
+                  >scans/example.com/2026-04-18T19-54-54/results.csv</span
+                >
+              </div>
+              <div class="text-slate-600 text-xs mt-1">
+                44 OK · <span class="text-red-400">2 broken</span> · 1 redirect
+              </div>
+            </div>
+          </div>
+        </article>
+        <div class="text-center mb-14">
+          <a
+            href="#features"
+            class="px-6 py-3 rounded-lg border border-slate-700 text-slate-300 hover:border-slate-500 hover:text-white transition-colors text-sm"
+            >Features ↓</a
+          >
+        </div>
+      </section>
+
+      <!-- ─────────────────── FEATURES ─────────────────── -->
+      <section id="features" class="py-24 px-6 bg-[#0a0e14]">
+        <div class="max-w-6xl mx-auto">
+          <div class="text-center mb-14">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+              Everything you need
+            </h2>
+            <p class="text-slate-400 max-w-lg mx-auto leading-relaxed">
+              Built on the Python standard library. Zero dependencies for the
+              core tool — just clone and scan.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"
+                  />
+                </svg>
+              </div>
+              <h3 class="font-semibold text-white mt-4 mb-2">
+                Recursive crawl
+              </h3>
+              <p class="text-slate-400 text-sm leading-relaxed">
+                BFS traversal from the start URL through all internal pages.
+                Visited-URL tracking prevents infinite loops on any site
+                structure.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                  />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+              </div>
+              <h3 class="font-semibold text-white mt-4 mb-2">
+                External links checked
+              </h3>
+              <p class="text-slate-400 text-sm leading-relaxed">
+                External URLs are verified for their HTTP status without being
+                crawled — full coverage with no recursion noise.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+              </div>
+              <h3 class="font-semibold text-white mt-4 mb-2">
+                Parallel requests
+              </h3>
+              <p class="text-slate-400 text-sm leading-relaxed">
+                Thread pool with configurable workers (default: 10). Scans large
+                sites fast without hammering your server.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+              </div>
+              <h3 class="font-semibold text-white mt-4 mb-2">
+                CSV + Markdown output
+              </h3>
+              <p class="text-slate-400 text-sm leading-relaxed">
+                Each scan writes a machine-readable CSV and a human-readable
+                Markdown summary, organised by timestamp under
+                <code class="code-inline">scans/</code>.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <polygon
+                    points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"
+                  />
+                </svg>
+              </div>
+              <h3 class="font-semibold text-white mt-4 mb-2">
+                Status-code filtering
+              </h3>
+              <p class="text-slate-400 text-sm leading-relaxed">
+                <code class="code-inline">--keep-status-codes 404,500</code>
+                trims the report to only the codes you care about — no noise,
+                straight to the problems.
+              </p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                  />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+              </div>
+              <h3 class="font-semibold text-white mt-4 mb-2">
+                Email notifications
+              </h3>
+              <p class="text-slate-400 text-sm leading-relaxed">
+                Receive a post-scan alert via the Resend API when broken links
+                are found. Optional 3xx inclusion for redirect awareness.
+              </p>
+            </div>
+          </div>
+          <div class="text-center mt-14">
+            <a
+              href="#how-it-works"
+              class="px-6 py-3 rounded-lg border border-slate-700 text-slate-300 hover:border-slate-500 hover:text-white transition-colors text-sm"
+              >How it works ↓</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ─────────────────── HOW IT WORKS ─────────────────── -->
+      <section id="how-it-works" class="py-24 px-6">
+        <div class="max-w-4xl mx-auto">
+          <div class="text-center mb-14">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-4">How it works</h2>
+            <p class="text-slate-400 max-w-md mx-auto">
+              A three-stage pipeline — crawl, check, report.
+            </p>
+          </div>
+
+          <div class="flex flex-col md:flex-row items-stretch gap-0">
+            <!-- Step 1 -->
+            <div class="step-card flex-1">
+              <div class="step-number">1</div>
+              <h3 class="font-semibold text-white mb-2 mt-4">Crawl</h3>
+              <p class="text-slate-400 text-sm leading-relaxed">
+                BFS from the start URL. Internal links are followed; external
+                links are collected but not recursed into. Fragments are
+                stripped and URL normalisation prevents duplicates.
+              </p>
+              <div class="mt-4 font-mono text-xs text-cyan-400/60">
+                crawler.py → parser.py → normaliser.py
+              </div>
+            </div>
+
+            <!-- Arrow (desktop) -->
+            <div
+              class="hidden md:flex items-center px-3 text-slate-700 flex-shrink-0"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </div>
+            <!-- Arrow (mobile) -->
+            <div class="md:hidden flex justify-center py-3 text-slate-700">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                class="rotate-90"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-card flex-1">
+              <div class="step-number">2</div>
+              <h3 class="font-semibold text-white mb-2 mt-4">Check</h3>
+              <p class="text-slate-400 text-sm leading-relaxed">
+                Every discovered URL is status-checked in parallel. HEAD is
+                attempted first; 405 responses fall back to GET. 3xx codes are
+                recorded as-is — redirects are not followed.
+              </p>
+              <div class="mt-4 font-mono text-xs text-cyan-400/60">
+                fetcher.check_url() · ThreadPoolExecutor
+              </div>
+            </div>
+
+            <!-- Arrow (desktop) -->
+            <div
+              class="hidden md:flex items-center px-3 text-slate-700 flex-shrink-0"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </div>
+            <!-- Arrow (mobile) -->
+            <div class="md:hidden flex justify-center py-3 text-slate-700">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                class="rotate-90"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card flex-1">
+              <div class="step-number">3</div>
+              <h3 class="font-semibold text-white mb-2 mt-4">Report</h3>
+              <p class="text-slate-400 text-sm leading-relaxed">
+                Results are sorted by
+                <code class="code-inline">(referrer, link)</code> and written to
+                CSV. A Markdown summary highlights all non-200 links.
+                Optionally, a Resend email is dispatched.
+              </p>
+              <div class="mt-4 font-mono text-xs text-cyan-400/60">
+                reporter.py · emailer.py
+              </div>
+            </div>
+          </div>
+          <div class="text-center mt-14">
+            <a
+              href="#quick-start"
+              class="px-6 py-3 rounded-lg border border-slate-700 text-slate-300 hover:border-slate-500 hover:text-white transition-colors text-sm"
+              >Quick start ↓</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ─────────────────── QUICK START ─────────────────── -->
+      <section id="quick-start" class="py-24 px-6 bg-[#0a0e14]">
+        <div class="max-w-3xl mx-auto">
+          <div class="text-center mb-14">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-4">Quick start</h2>
+            <p class="text-slate-400">
+              Python 3.10+ required. Core tool needs no packages.
+            </p>
+          </div>
+
+          <div class="space-y-8">
+            <div>
+              <p
+                class="text-xs font-mono uppercase tracking-widest text-slate-500 mb-3"
+              >
+                1 — Clone
+              </p>
+              <div class="code-block">
+                <pre>git clone https://github.com/JeremieLitzler/linkprobe.git
+cd linkprobe
+
+<span class="text-slate-500"># Optional: Resend SDK (only needed for --notify-email)</span>
+pip install -r requirements.txt</pre>
+              </div>
+            </div>
+
+            <div>
+              <p
+                class="text-xs font-mono uppercase tracking-widest text-slate-500 mb-3"
+              >
+                2 — Run a scan
+              </p>
+              <div class="code-block">
+                <pre><span class="text-slate-500"># Auto-saves to scans/[WEBSITE]/[TIMESTAMP]/</span>
+python src/checker.py https://example.com
+
+<span class="text-slate-500"># Custom output file, more workers</span>
+python src/checker.py https://example.com \
+  --output report.csv \
+  --workers 20
+
+<span class="text-slate-500"># Show only broken links</span>
+python src/checker.py https://example.com \
+  --keep-status-codes 404,500</pre>
+              </div>
+            </div>
+
+            <div>
+              <p
+                class="text-xs font-mono uppercase tracking-widest text-slate-500 mb-3"
+              >
+                3 — Email alerts (optional)
+              </p>
+              <div class="code-block">
+                <pre><span class="text-slate-500">export RESEND_API_KEY=re_xxxx
+export RESEND_FROM_ADDRESS=scanner@yourdomain.com</span>
+
+python src/checker.py https://example.com \
+  --notify-email you@example.com</pre>
+              </div>
+            </div>
+          </div>
+          <div class="text-center mt-14">
+            <a
+              href="#options"
+              class="px-6 py-3 rounded-lg border border-slate-700 text-slate-300 hover:border-slate-500 hover:text-white transition-colors text-sm"
+              >CLI options ↓</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ─────────────────── CLI OPTIONS ─────────────────── -->
+      <section id="options" class="py-24 px-6">
+        <div class="max-w-4xl mx-auto">
+          <div class="text-center mb-14">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-4">CLI options</h2>
+            <p class="text-slate-400">
+              All flags are optional except
+              <code class="code-inline">start_url</code>.
+            </p>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-800">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-slate-800 bg-[#161b27]">
+                  <th
+                    class="text-left px-5 py-3.5 font-mono text-slate-300 font-semibold whitespace-nowrap"
+                  >
+                    Option
+                  </th>
+                  <th
+                    class="text-left px-5 py-3.5 font-mono text-slate-300 font-semibold whitespace-nowrap"
+                  >
+                    Default
+                  </th>
+                  <th
+                    class="text-left px-5 py-3.5 text-slate-300 font-semibold"
+                  >
+                    Description
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/50">
+                <tr class="bg-[#0d1117]">
+                  <td
+                    class="px-5 py-4 font-mono text-cyan-400 whitespace-nowrap"
+                  >
+                    start_url
+                  </td>
+                  <td class="px-5 py-4 font-mono text-xs text-slate-500">
+                    required
+                  </td>
+                  <td class="px-5 py-4 text-slate-400">
+                    The URL to crawl from — must use
+                    <code class="code-inline">http</code> or
+                    <code class="code-inline">https</code>
+                  </td>
+                </tr>
+                <tr class="bg-[#161b27]/30">
+                  <td
+                    class="px-5 py-4 font-mono text-cyan-400 whitespace-nowrap"
+                  >
+                    --output, -o
+                  </td>
+                  <td class="px-5 py-4 font-mono text-xs text-slate-500">
+                    scans/[site]/[ts]/
+                  </td>
+                  <td class="px-5 py-4 text-slate-400">
+                    Path to the output CSV file
+                  </td>
+                </tr>
+                <tr class="bg-[#0d1117]">
+                  <td
+                    class="px-5 py-4 font-mono text-cyan-400 whitespace-nowrap"
+                  >
+                    --workers, -w
+                  </td>
+                  <td class="px-5 py-4 font-mono text-xs text-slate-500">10</td>
+                  <td class="px-5 py-4 text-slate-400">
+                    Number of parallel threads for status checking
+                  </td>
+                </tr>
+                <tr class="bg-[#161b27]/30">
+                  <td
+                    class="px-5 py-4 font-mono text-cyan-400 whitespace-nowrap"
+                  >
+                    --timeout, -t
+                  </td>
+                  <td class="px-5 py-4 font-mono text-xs text-slate-500">10</td>
+                  <td class="px-5 py-4 text-slate-400">
+                    Per-request timeout in seconds
+                  </td>
+                </tr>
+                <tr class="bg-[#0d1117]">
+                  <td
+                    class="px-5 py-4 font-mono text-cyan-400 whitespace-nowrap"
+                  >
+                    --user-agent
+                  </td>
+                  <td class="px-5 py-4 font-mono text-xs text-slate-500">
+                    linkprobe/1.0
+                  </td>
+                  <td class="px-5 py-4 text-slate-400">
+                    User-Agent header sent with every request
+                  </td>
+                </tr>
+                <tr class="bg-[#161b27]/30">
+                  <td
+                    class="px-5 py-4 font-mono text-cyan-400 whitespace-nowrap"
+                  >
+                    --keep-status-codes
+                  </td>
+                  <td class="px-5 py-4 font-mono text-xs text-slate-500">
+                    all
+                  </td>
+                  <td class="px-5 py-4 text-slate-400">
+                    Comma-separated codes to retain in the report, e.g.
+                    <code class="code-inline">404,500</code>
+                  </td>
+                </tr>
+                <tr class="bg-[#0d1117]">
+                  <td
+                    class="px-5 py-4 font-mono text-cyan-400 whitespace-nowrap"
+                  >
+                    --notify-email
+                  </td>
+                  <td class="px-5 py-4 font-mono text-xs text-slate-500">
+                    off
+                  </td>
+                  <td class="px-5 py-4 text-slate-400">
+                    Recipient address for a post-scan email (requires Resend env
+                    vars)
+                  </td>
+                </tr>
+                <tr class="bg-[#161b27]/30">
+                  <td
+                    class="px-5 py-4 font-mono text-cyan-400 whitespace-nowrap"
+                  >
+                    --include-3xx-status-code
+                  </td>
+                  <td class="px-5 py-4 font-mono text-xs text-slate-500">
+                    off
+                  </td>
+                  <td class="px-5 py-4 text-slate-400">
+                    Include 3xx redirects in email notifications
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="text-center mt-14">
+            <a
+              href="#output"
+              class="px-6 py-3 rounded-lg border border-slate-700 text-slate-300 hover:border-slate-500 hover:text-white transition-colors text-sm"
+              >Output format ↓</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ─────────────────── OUTPUT FORMAT ─────────────────── -->
+      <section id="output" class="py-24 px-6 bg-[#0a0e14]">
+        <div class="max-w-3xl mx-auto">
+          <div class="text-center mb-14">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-4">Output format</h2>
+            <p class="text-slate-400">
+              Results sorted by <code class="code-inline">referrer</code> then
+              <code class="code-inline">link</code> — broken links are
+              immediately actionable.
+            </p>
+          </div>
+
+          <p
+            class="text-xs font-mono uppercase tracking-widest text-slate-500 mb-3"
+          >
+            results.csv
+          </p>
+          <div class="code-block mb-10">
+            <pre><span class="text-slate-400">link,referrer,http_status_code</span>
+<span class="text-slate-300">https://example.com/about/,https://example.com/,</span><span class="text-red-400">404</span>
+<span class="text-slate-400">https://example.com/blog/,https://example.com/,200</span>
+<span class="text-slate-400">https://example.com/contact/,https://example.com/,200</span>
+<span class="text-slate-300">https://external.com/missing,https://example.com/contact/,</span><span class="text-red-400">404</span>
+<span class="text-slate-400">https://external.com/page,https://example.com/contact/,200</span></pre>
+          </div>
+
+          <div class="grid sm:grid-cols-3 gap-4">
+            <div class="output-col-card">
+              <div class="font-mono text-cyan-400 text-xs mb-2">link</div>
+              <p class="text-slate-400 text-sm">The URL that was checked</p>
+            </div>
+            <div class="output-col-card">
+              <div class="font-mono text-cyan-400 text-xs mb-2">referrer</div>
+              <p class="text-slate-400 text-sm">
+                The page containing the link — tells you exactly where to fix it
+              </p>
+            </div>
+            <div class="output-col-card">
+              <div class="font-mono text-cyan-400 text-xs mb-2">
+                http_status_code
+              </div>
+              <p class="text-slate-400 text-sm">
+                HTTP code or
+                <code class="code-inline">ERROR:&lt;ExceptionName&gt;</code> for
+                network failures
+              </p>
+            </div>
+          </div>
+          <div class="text-center mt-14">
+            <a
+              href="#email"
+              class="px-6 py-3 rounded-lg border border-slate-700 text-slate-300 hover:border-slate-500 hover:text-white transition-colors text-sm"
+              >Email notifications ↓</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ─────────────────── EMAIL NOTIFICATIONS ─────────────────── -->
+      <section id="email" class="py-24 px-6">
+        <div class="max-w-3xl mx-auto">
+          <div class="text-center mb-14">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-4">
+              Email notifications
+            </h2>
+            <p class="text-slate-400 max-w-lg mx-auto leading-relaxed">
+              Get a summary email whenever broken links are detected. Powered by
+              <a
+                href="https://resend.com"
+                class="text-cyan-400 hover:underline"
+                target="_blank"
+                rel="noopener"
+                >Resend</a
+              >
+              — set two environment variables and you're done.
+            </p>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-800 mb-8">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-slate-800 bg-[#161b27]">
+                  <th
+                    class="text-left px-5 py-3.5 font-mono text-slate-300 font-semibold"
+                  >
+                    Variable
+                  </th>
+                  <th
+                    class="text-left px-5 py-3.5 text-slate-300 font-semibold"
+                  >
+                    Description
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/50">
+                <tr class="bg-[#0d1117]">
+                  <td class="px-5 py-4 font-mono text-cyan-400">
+                    RESEND_API_KEY
+                  </td>
+                  <td class="px-5 py-4 text-slate-400">
+                    API key from your Resend account
+                  </td>
+                </tr>
+                <tr class="bg-[#161b27]/30">
+                  <td class="px-5 py-4 font-mono text-cyan-400">
+                    RESEND_FROM_ADDRESS
+                  </td>
+                  <td class="px-5 py-4 text-slate-400">
+                    Verified sender address in Resend
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <pre><span class="text-slate-500">export RESEND_API_KEY=re_xxxx
+export RESEND_FROM_ADDRESS=scanner@yourdomain.com</span>
+
+python src/checker.py https://example.com \
+  --notify-email you@example.com \
+  --include-3xx-status-code</pre>
+          </div>
+          <div class="text-center mt-12">
+            <a
+              href="https://github.com/JeremieLitzler/linkprobe"
+              target="_blank"
+              rel="noopener"
+              class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-cyan-400 text-[#0d1117] font-semibold hover:bg-cyan-300 transition-colors text-sm"
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
+                />
+              </svg>
+              View on GitHub
+            </a>
+          </div>
+          <div class="text-center mt-8">
+            <p class="mb-8 text-slate-400 max-w-lg mx-auto leading-relaxed">
+              Need help setting it up?
+            </p>
+            <a
+              href="https://iamjeremie.me/page/contact-me/"
+              target="_blank"
+              rel="noopener"
+              class="px-6 py-3 rounded-lg border bg-green-500 border-green-700 font-semibold text-gray-900 hover:bg-green-300 hover:text-gray-900 transition-colors text-sm"
+              >Contact Me</a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ─────────────────── FOOTER ─────────────────── -->
+    <footer class="border-t border-slate-800 py-10 px-6">
+      <div
+        class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500"
+      >
+        <div
+          class="flex items-center gap-2.5 flex-wrap justify-center sm:justify-start"
+        >
+          <img
+            src="icon-c-probe.svg"
+            width="18"
+            height="18"
+            alt=""
+            aria-hidden="true"
+          />
+          <span class="font-mono"
+            ><span class="text-cyan-400/70">link</span>probe</span
+          >
+          <span class="text-slate-700">·</span>
+          <span>v1.2.1</span>
+          <span class="text-slate-700">·</span>
+          <a
+            href="https://github.com/JeremieLitzler/linkprobe/blob/main/LICENSE"
+            target="_blank"
+            rel="noopener"
+            class="hover:text-slate-300 transition-colors"
+            >MIT License</a
+          >
+        </div>
+        <div class="flex items-center gap-5">
+          <a
+            href="https://github.com/JeremieLitzler/linkprobe"
+            target="_blank"
+            rel="noopener"
+            class="hover:text-slate-300 transition-colors"
+            >GitHub</a
+          >
+          <a
+            href="https://github.com/JeremieLitzler/linkprobe/issues"
+            target="_blank"
+            rel="noopener"
+            class="hover:text-slate-300 transition-colors"
+            >Issues</a
+          >
+          <a
+            href="https://github.com/JeremieLitzler/linkprobe/blob/main/CHANGELOG.md"
+            target="_blank"
+            rel="noopener"
+            class="hover:text-slate-300 transition-colors"
+            >Changelog</a
+          >
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

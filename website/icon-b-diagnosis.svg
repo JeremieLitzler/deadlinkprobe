@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" fill="none">
+  <circle cx="48" cy="48" r="46" fill="#161b27"/>
+  <circle cx="48" cy="48" r="44" stroke="#22d3ee" stroke-width="0.5" stroke-dasharray="3 5" opacity="0.25"/>
+  <!-- left link: intact, cyan -->
+  <rect x="6" y="37" width="46" height="22" rx="11" fill="#161b27" stroke="#22d3ee" stroke-width="2.75"/>
+  <!-- right link: broken, red — drawn as three path segments with a gap at top-middle -->
+  <path d="M 51,48 a11,11 0 0 1 11,-11" stroke="#f85149" stroke-width="2.75" fill="none" stroke-linecap="round"/>
+  <path d="M 62,37 L 66,37" stroke="#f85149" stroke-width="2.75" stroke-linecap="round"/>
+  <path d="M 74,37 L 79,37" stroke="#f85149" stroke-width="2.75" stroke-linecap="round"/>
+  <path d="M 79,37 a11,11 0 0 1 11,11 a11,11 0 0 1 -11,11 L 62,59 a11,11 0 0 1 -11,-11" stroke="#f85149" stroke-width="2.75" fill="none" stroke-linecap="round"/>
+  <!-- spark / crack lines in the gap -->
+  <path d="M 68,32 L 69.5,35 L 68.5,38 L 70,41" stroke="#f85149" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M 72,32 L 70.5,35 L 71.5,38 L 70,41" stroke="#f85149" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>
