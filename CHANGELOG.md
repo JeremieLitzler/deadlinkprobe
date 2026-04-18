@@ -1,3 +1,9 @@
+## [1.2.1](https://github.com/JeremieLitzler/deadlinkchecker/compare/v1.2.0...v1.2.1) (2026-04-18)
+
+### Bug Fixes
+
+* **normalizer:** add percent-encoding spaces in URLs ([#40](https://github.com/JeremieLitzler/deadlinkchecker/issues/40)) ([85eeb18](https://github.com/JeremieLitzler/deadlinkchecker/commit/85eeb180b4a5511591deba4893726e28c3fa9720))
+
 ## [1.2.0](https://github.com/JeremieLitzler/deadlinkchecker/compare/v1.1.0...v1.2.0) (2026-04-17)
 
 ### Features
