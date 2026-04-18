@@ -4,7 +4,7 @@
 
 - Python: `/e/Applications/Scoop/apps/python/current/python.exe` (3.14.3)
 - Command: `python -m unittest discover -s tests -v`
-- Working directory: `E:/Git/GitHub/deadlinkchecker`
+- Working directory: `E:/Git/GitHub/linkprobe`
 - Date: 2026-02-20
 
 ---
@@ -23,46 +23,46 @@ No new test files were created. The instruction specified adding to existing fil
 
 Tests that `crawler.crawl()` prints `DISCOVERED <url>` to stdout for every URL it adds to the results list. Uses `unittest.mock.patch` on `crawler.fetch_html` and `sys.stdout` to isolate network I/O and capture output.
 
-| Test | Description | Result |
-|---|---|---|
-| `test_discovered_printed_for_start_url` | `DISCOVERED` is printed for the start URL itself before any pages are fetched | PASS |
-| `test_discovered_printed_for_each_found_link` | `DISCOVERED` is printed for each internal and external link found during crawl | PASS |
-| `test_discovered_count_matches_results` | The count of `DISCOVERED` lines equals the number of `(link, referrer)` tuples returned | PASS |
-| `test_no_discovered_when_start_url_invalid` | No `DISCOVERED` line appears and result is `[]` when start URL normalisation returns `None` (e.g. `mailto:` scheme) | PASS |
-| `test_duplicate_links_not_discovered_twice` | A URL linked from multiple pages produces exactly one `DISCOVERED` line | PASS |
+| Test                                          | Description                                                                                                         | Result |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------ |
+| `test_discovered_printed_for_start_url`       | `DISCOVERED` is printed for the start URL itself before any pages are fetched                                       | PASS   |
+| `test_discovered_printed_for_each_found_link` | `DISCOVERED` is printed for each internal and external link found during crawl                                      | PASS   |
+| `test_discovered_count_matches_results`       | The count of `DISCOVERED` lines equals the number of `(link, referrer)` tuples returned                             | PASS   |
+| `test_no_discovered_when_start_url_invalid`   | No `DISCOVERED` line appears and result is `[]` when start URL normalisation returns `None` (e.g. `mailto:` scheme) | PASS   |
+| `test_duplicate_links_not_discovered_twice`   | A URL linked from multiple pages produces exactly one `DISCOVERED` line                                             | PASS   |
 
 ### `TestCheckerCheckedOutput`
 
 Tests that `checker.main()` prints `CHECKED <url> <status>` to stdout after each future completes. Uses `patch` on `crawler.crawl`, `fetcher.check_url`, and `sys.stdout` to run `main()` without network access.
 
-| Test | Description | Result |
-|---|---|---|
-| `test_checked_line_printed_for_each_link` | A `CHECKED` line is printed for every link returned by the crawl | PASS |
-| `test_checked_line_format_with_status_code` | Format is exactly `CHECKED <url> <status_code>` for numeric statuses | PASS |
-| `test_checked_line_format_with_error_status` | Format is exactly `CHECKED <url> ERROR:<ExceptionClassName>` for error statuses | PASS |
-| `test_no_checked_lines_when_no_links` | No `CHECKED` lines appear when crawl returns an empty list | PASS |
-| `test_summary_line_present_after_checked_lines` | The final `Checked N links. Results written to ...` summary line is present | PASS |
+| Test                                            | Description                                                                     | Result |
+| ----------------------------------------------- | ------------------------------------------------------------------------------- | ------ |
+| `test_checked_line_printed_for_each_link`       | A `CHECKED` line is printed for every link returned by the crawl                | PASS   |
+| `test_checked_line_format_with_status_code`     | Format is exactly `CHECKED <url> <status_code>` for numeric statuses            | PASS   |
+| `test_checked_line_format_with_error_status`    | Format is exactly `CHECKED <url> ERROR:<ExceptionClassName>` for error statuses | PASS   |
+| `test_no_checked_lines_when_no_links`           | No `CHECKED` lines appear when crawl returns an empty list                      | PASS   |
+| `test_summary_line_present_after_checked_lines` | The final `Checked N links. Results written to ...` summary line is present     | PASS   |
 
 ### `TestCheckerThreadSafety`
 
 Tests that `print_lock` in `checker.main()` prevents interleaved output under concurrent execution. Uses 10 workers checking 20 URLs concurrently, with a 10 ms artificial delay per `check_url` call to encourage simultaneous completions.
 
-| Test | Description | Result |
-|---|---|---|
-| `test_checked_lines_are_not_interleaved` | Every `CHECKED` line matches the expected regex, no partial or merged lines exist, every URL appears exactly once | PASS |
+| Test                                     | Description                                                                                                       | Result |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------ |
+| `test_checked_lines_are_not_interleaved` | Every `CHECKED` line matches the expected regex, no partial or merged lines exist, every URL appears exactly once | PASS   |
 
 ---
 
 ## Pre-existing Tests (unchanged, all still pass)
 
-| File | Test Class | Tests | Result |
-|---|---|---|---|
-| `tests/test_checker_cli.py` | `TestCheckerCLI` | 3 | PASS |
-| `tests/test_fetcher.py` | `TestCheckUrl` | 4 | PASS |
-| `tests/test_normaliser.py` | `TestNormalise` | 8 | PASS |
-| `tests/test_parser.py` | `TestExtractLinks` | 4 | PASS |
-| `tests/test_reporter.py` | `TestWriteCsv` | 1 | PASS |
-| `tests/test_integration.py` | `TestIntegration` | 5 | PASS |
+| File                        | Test Class         | Tests | Result |
+| --------------------------- | ------------------ | ----- | ------ |
+| `tests/test_checker_cli.py` | `TestCheckerCLI`   | 3     | PASS   |
+| `tests/test_fetcher.py`     | `TestCheckUrl`     | 4     | PASS   |
+| `tests/test_normaliser.py`  | `TestNormalise`    | 8     | PASS   |
+| `tests/test_parser.py`      | `TestExtractLinks` | 4     | PASS   |
+| `tests/test_reporter.py`    | `TestWriteCsv`     | 1     | PASS   |
+| `tests/test_integration.py` | `TestIntegration`  | 5     | PASS   |
 
 ---
 
@@ -117,7 +117,7 @@ OK
 ## Notes
 
 - Two `ResourceWarning` messages appeared during `test_retries_get_on_405` and `test_returns_error_on_url_error` from the pre-existing `test_fetcher.py`. These originate from Python 3.14's garbage-collection detecting unclosed `HTTPError` objects in mock setups. They are cosmetic and do not affect correctness — all assertions passed.
-- The integration tests made live network requests to `https://deadlinkchecker-sample-website.netlify.app` and validated real HTTP responses, including the expected `404` on `/about/`.
+- The integration tests made live network requests to `https://linkprobe-sample-website.netlify.app` and validated real HTTP responses, including the expected `404` on `/about/`.
 - The thread-safety test uses 10 workers and 20 URLs with a 10 ms artificial delay to provoke concurrent `print()` calls, then verifies every output line matches the exact `CHECKED <url> <status>` format with no corruption.
 
 ---
@@ -137,7 +137,7 @@ status: passed
 
 - Python: `/e/Applications/Scoop/apps/python/current/python.exe` (3.14.3)
 - Command: `python -m pytest tests/ -v`
-- Working directory: `E:/Git/GitHub/deadlinkchecker`
+- Working directory: `E:/Git/GitHub/linkprobe`
 - Date: 2026-02-24
 
 ---
@@ -152,32 +152,32 @@ status: passed
 
 Tests for `reporter.write_markdown_summary(results, output_path, timestamp)`.
 
-| Test | Description | Result |
-|---|---|---|
-| `test_file_is_created` | Output file exists at the given path after the call | PASS |
-| `test_first_non_empty_line_is_heading` | First non-empty line is `## <timestamp>` | PASS |
-| `test_table_header_row_present` | Content contains `| URL | Referrer | HTTP Status |` | PASS |
-| `test_non_200_rows_appear_in_table_body` | Rows with status 404, 500, ERROR:URLError are present in the table body | PASS |
-| `test_200_rows_do_not_appear_in_table_body` | Rows with status 200 are absent from the table body | PASS |
-| `test_all_200_results_produce_empty_table_body` | When every result is 200, no data rows appear after the separator | PASS |
-| `test_empty_results_writes_heading_and_empty_table` | An empty results list still produces the heading, header row and separator with no data rows | PASS |
-| `test_oserror_on_unwritable_path_causes_systemexit_1` | An unwritable path (missing parent directory) causes `SystemExit` with code 1 | PASS |
+| Test                                                  | Description                                                                                  | Result |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------ | -------- | ----------- | --- | ---- |
+| `test_file_is_created`                                | Output file exists at the given path after the call                                          | PASS   |
+| `test_first_non_empty_line_is_heading`                | First non-empty line is `## <timestamp>`                                                     | PASS   |
+| `test_table_header_row_present`                       | Content contains `                                                                           | URL    | Referrer | HTTP Status | `   | PASS |
+| `test_non_200_rows_appear_in_table_body`              | Rows with status 404, 500, ERROR:URLError are present in the table body                      | PASS   |
+| `test_200_rows_do_not_appear_in_table_body`           | Rows with status 200 are absent from the table body                                          | PASS   |
+| `test_all_200_results_produce_empty_table_body`       | When every result is 200, no data rows appear after the separator                            | PASS   |
+| `test_empty_results_writes_heading_and_empty_table`   | An empty results list still produces the heading, header row and separator with no data rows | PASS   |
+| `test_oserror_on_unwritable_path_causes_systemexit_1` | An unwritable path (missing parent directory) causes `SystemExit` with code 1                | PASS   |
 
 ---
 
 ### Pre-existing Tests (unchanged, all still pass)
 
-| File | Test Class | Tests | Result |
-|---|---|---|---|
-| `tests/test_checker_cli.py` | `TestCheckerCLI` | 3 | PASS |
-| `tests/test_checker_cli.py` | `TestCrawlerDiscoveredOutput` | 5 | PASS |
-| `tests/test_checker_cli.py` | `TestCheckerCheckedOutput` | 5 | PASS |
-| `tests/test_checker_cli.py` | `TestCheckerThreadSafety` | 1 | PASS |
-| `tests/test_fetcher.py` | `TestCheckUrl` | 4 | PASS |
-| `tests/test_normaliser.py` | `TestNormalise` | 8 | PASS |
-| `tests/test_parser.py` | `TestExtractLinks` | 4 | PASS |
-| `tests/test_reporter.py` | `TestWriteCsv` | 1 | PASS |
-| `tests/test_integration.py` | `TestIntegration` | 5 | PASS |
+| File                        | Test Class                    | Tests | Result |
+| --------------------------- | ----------------------------- | ----- | ------ |
+| `tests/test_checker_cli.py` | `TestCheckerCLI`              | 3     | PASS   |
+| `tests/test_checker_cli.py` | `TestCrawlerDiscoveredOutput` | 5     | PASS   |
+| `tests/test_checker_cli.py` | `TestCheckerCheckedOutput`    | 5     | PASS   |
+| `tests/test_checker_cli.py` | `TestCheckerThreadSafety`     | 1     | PASS   |
+| `tests/test_fetcher.py`     | `TestCheckUrl`                | 4     | PASS   |
+| `tests/test_normaliser.py`  | `TestNormalise`               | 8     | PASS   |
+| `tests/test_parser.py`      | `TestExtractLinks`            | 4     | PASS   |
+| `tests/test_reporter.py`    | `TestWriteCsv`                | 1     | PASS   |
+| `tests/test_integration.py` | `TestIntegration`             | 5     | PASS   |
 
 ---
 
@@ -247,22 +247,22 @@ status: passed
 
 - Python: `/e/Applications/Scoop/apps/python/current/python.exe` (3.14.3)
 - Command: `python -m pytest tests/ -v`
-- Working directory: `E:/Git/GitHub/deadlinkchecker`
+- Working directory: `E:/Git/GitHub/linkprobe`
 - Date: 2026-02-24
-- File under review: `.github/workflows/deadlinkchecker.yml`
+- File under review: `.github/workflows/linkprobe.yml`
 
 ### Static Checks Against Spec
 
-| # | Requirement | Result | Notes |
-|---|---|---|---|
-| 1 | Checkout step does NOT specify `ref: data/scans` (must check out default branch first so it never fails on first run) | PASS | The `actions/checkout@v4` step has no `ref:` key; it checks out the default branch. |
-| 2 | Checkout step has `fetch-depth: 0` | PASS | `fetch-depth: 0` is present under the checkout `with:` block. |
-| 3 | "Ensure data/scans branch exists" step comes AFTER the checkout step | PASS | Checkout is the first step; "Ensure data/scans branch exists" is the second step — order is correct. |
-| 4 | That step runs `git fetch origin data/scans \|\| true` to avoid failure when branch does not exist | PASS | `git fetch origin data/scans \|\| true` is present exactly as specified. |
-| 5 | That step runs `git checkout data/scans 2>/dev/null \|\| git checkout -b data/scans` | PASS | `git checkout data/scans 2>/dev/null \|\| git checkout -b data/scans` is present exactly as specified. |
-| 6 | Commit/push step uses `git push origin data/scans` (not bare `git push`) | PASS | `git push origin data/scans` — explicit remote and branch are named. |
-| 7 | `git diff --cached --quiet \|\| git commit` guard is still present (no commit if nothing changed) | PASS | `git diff --cached --quiet \|\| git commit -m "bot: add scan for $(date +%Y-%m-%d)"` is present. |
-| 8 | No changes to any `src/` files or test files | PASS | Only `.github/workflows/deadlinkchecker.yml` was modified; no `src/` or `tests/` files were touched. |
+| #   | Requirement                                                                                                           | Result | Notes                                                                                                  |
+| --- | --------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------ |
+| 1   | Checkout step does NOT specify `ref: data/scans` (must check out default branch first so it never fails on first run) | PASS   | The `actions/checkout@v4` step has no `ref:` key; it checks out the default branch.                    |
+| 2   | Checkout step has `fetch-depth: 0`                                                                                    | PASS   | `fetch-depth: 0` is present under the checkout `with:` block.                                          |
+| 3   | "Ensure data/scans branch exists" step comes AFTER the checkout step                                                  | PASS   | Checkout is the first step; "Ensure data/scans branch exists" is the second step — order is correct.   |
+| 4   | That step runs `git fetch origin data/scans \|\| true` to avoid failure when branch does not exist                    | PASS   | `git fetch origin data/scans \|\| true` is present exactly as specified.                               |
+| 5   | That step runs `git checkout data/scans 2>/dev/null \|\| git checkout -b data/scans`                                  | PASS   | `git checkout data/scans 2>/dev/null \|\| git checkout -b data/scans` is present exactly as specified. |
+| 6   | Commit/push step uses `git push origin data/scans` (not bare `git push`)                                              | PASS   | `git push origin data/scans` — explicit remote and branch are named.                                   |
+| 7   | `git diff --cached --quiet \|\| git commit` guard is still present (no commit if nothing changed)                     | PASS   | `git diff --cached --quiet \|\| git commit -m "bot: add scan for $(date +%Y-%m-%d)"` is present.       |
+| 8   | No changes to any `src/` files or test files                                                                          | PASS   | Only `.github/workflows/linkprobe.yml` was modified; no `src/` or `tests/` files were touched.         |
 
 All 8 static checks pass.
 
@@ -273,7 +273,7 @@ No Python source files changed; the test suite is run to confirm no regressions 
 ```
 ============================= test session starts =============================
 platform win32 -- Python 3.14.3, pytest-9.0.2, pluggy-1.6.0
-rootdir: E:\Git\GitHub\deadlinkchecker
+rootdir: E:\Git\GitHub\linkprobe
 collected 44 items
 
 tests/test_checker_cli.py::TestCheckerCLI::test_help_exits_zero PASSED
@@ -337,31 +337,31 @@ status: passed
 
 - Python: `/e/Applications/Scoop/apps/python/current/python.exe` (3.14.3)
 - Command: `python -m pytest tests/ -v`
-- Working directory: `E:/Git/GitHub/deadlinkchecker`
+- Working directory: `E:/Git/GitHub/linkprobe`
 - Date: 2026-02-24
 - Files under review: `.agents-brain/agent-1-specs.md`, `.agents-brain/agent-2-coder.md`
 
 ### Static Checks: `agent-1-specs.md`
 
-| # | Check | Result | Notes |
-|---|---|---|---|
-| 1 | The bullet "Key functions/types/interfaces with their signatures" is gone | PASS | No such phrase exists anywhere in the updated file. |
-| 2 | The prompt includes guidance on describing files and their roles without prescribing internal structure | PASS | Line 12: "Files to create or modify, and what each file's role is (without prescribing internal structure)". |
-| 3 | The prompt includes guidance on edge cases as observable consequences (not code paths) | PASS | Line 13: "Edge cases described as user-visible or externally observable consequences". |
-| 4 | The prompt includes guidance on concurrency as outcome qualities (not implementation blueprints) | PASS | Line 14: "Concurrency or performance requirements stated as qualities of the outcome ... not as implementation blueprints". |
-| 5 | An explicit WHAT vs HOW principle is stated | PASS | Line 16: "A good spec describes WHAT the system does ... It does not describe HOW the system does it." |
-| 6 | An explicit prohibition list exists covering: function signatures, pseudocode, code snippets, variable names, import lists | PASS | Lines 22-27 enumerate all five prohibited items plus a catch-all clause. |
+| #   | Check                                                                                                                      | Result | Notes                                                                                                                       |
+| --- | -------------------------------------------------------------------------------------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------- |
+| 1   | The bullet "Key functions/types/interfaces with their signatures" is gone                                                  | PASS   | No such phrase exists anywhere in the updated file.                                                                         |
+| 2   | The prompt includes guidance on describing files and their roles without prescribing internal structure                    | PASS   | Line 12: "Files to create or modify, and what each file's role is (without prescribing internal structure)".                |
+| 3   | The prompt includes guidance on edge cases as observable consequences (not code paths)                                     | PASS   | Line 13: "Edge cases described as user-visible or externally observable consequences".                                      |
+| 4   | The prompt includes guidance on concurrency as outcome qualities (not implementation blueprints)                           | PASS   | Line 14: "Concurrency or performance requirements stated as qualities of the outcome ... not as implementation blueprints". |
+| 5   | An explicit WHAT vs HOW principle is stated                                                                                | PASS   | Line 16: "A good spec describes WHAT the system does ... It does not describe HOW the system does it."                      |
+| 6   | An explicit prohibition list exists covering: function signatures, pseudocode, code snippets, variable names, import lists | PASS   | Lines 22-27 enumerate all five prohibited items plus a catch-all clause.                                                    |
 
 All 6 static checks for `agent-1-specs.md` pass.
 
 ### Static Checks: `agent-2-coder.md`
 
-| # | Check | Result | Notes |
-|---|---|---|---|
-| 1 | A "Technical Choice Explanations" section exists requiring "why" notes in `code-ready.md` | PASS | Line 38: `## Technical Choice Explanations`; requires explanation of why for each non-trivial decision. |
-| 2 | An "Object Calisthenics" section exists | PASS | Line 51: `## Object Calisthenics`. |
-| 3 | All nine rules are enumerated inline | PASS | Lines 57-65 list rules 1 through 9 explicitly with titles and descriptions. |
-| 4 | At least one concrete before/after example is included | PASS | Two examples are present: no-else rule (lines 67-86) and one-level-of-indentation rule (lines 88-109). |
+| #   | Check                                                                                     | Result | Notes                                                                                                   |
+| --- | ----------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------- |
+| 1   | A "Technical Choice Explanations" section exists requiring "why" notes in `code-ready.md` | PASS   | Line 38: `## Technical Choice Explanations`; requires explanation of why for each non-trivial decision. |
+| 2   | An "Object Calisthenics" section exists                                                   | PASS   | Line 51: `## Object Calisthenics`.                                                                      |
+| 3   | All nine rules are enumerated inline                                                      | PASS   | Lines 57-65 list rules 1 through 9 explicitly with titles and descriptions.                             |
+| 4   | At least one concrete before/after example is included                                    | PASS   | Two examples are present: no-else rule (lines 67-86) and one-level-of-indentation rule (lines 88-109).  |
 
 All 4 static checks for `agent-2-coder.md` pass.
 
@@ -372,7 +372,7 @@ No Python source files changed. The test suite is run to confirm no regressions.
 ```
 ============================= test session starts =============================
 platform win32 -- Python 3.14.3, pytest-9.0.2, pluggy-1.6.0
-rootdir: E:\Git\GitHub\deadlinkchecker
+rootdir: E:\Git\GitHub\linkprobe
 collected 44 items
 
 tests/test_checker_cli.py::TestCheckerCLI::test_help_exits_zero PASSED
@@ -436,15 +436,15 @@ status: passed
 
 - Python: `/e/Applications/Scoop/apps/python/current/python.exe` (3.14.3)
 - Command: `python -m pytest tests/ -v`
-- Working directory: `E:/Git/GitHub/deadlinkchecker`
+- Working directory: `E:/Git/GitHub/linkprobe`
 - Date: 2026-02-25
 
 ---
 
 ### Fixes Applied Before Running Tests
 
-| File | Problem | Fix |
-|---|---|---|
+| File                   | Problem                                                                            | Fix                                                                                         |
+| ---------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | `tests/test_parser.py` | `import parser as link_parser` failed — `parser.py` was renamed to `web_parser.py` | Changed to `import web_parser as link_parser`; updated module docstring and section comment |
 
 ---
@@ -465,95 +465,95 @@ status: passed
 
 Tests `argument_parser.build_arg_parser()` directly by calling `parse_args()` with controlled input lists.
 
-| Test | Description | Result |
-|---|---|---|
-| `test_start_url_is_required` | Omitting `start_url` raises `SystemExit` | PASS |
-| `test_start_url_stored` | `start_url` positional is stored on the namespace | PASS |
-| `test_output_default_is_none` | `--output` defaults to `None` | PASS |
-| `test_output_long_flag` | `--output` stores the provided path | PASS |
-| `test_output_short_flag` | `-o` is an alias for `--output` | PASS |
-| `test_workers_default` | `--workers` defaults to `10` | PASS |
-| `test_workers_long_flag` | `--workers` stores the given integer | PASS |
-| `test_workers_short_flag` | `-w` is an alias for `--workers` | PASS |
-| `test_workers_is_int` | `--workers` value is stored as `int` | PASS |
-| `test_timeout_default` | `--timeout` defaults to `10` | PASS |
-| `test_timeout_long_flag` | `--timeout` stores the given integer | PASS |
-| `test_timeout_short_flag` | `-t` is an alias for `--timeout` | PASS |
-| `test_timeout_is_int` | `--timeout` value is stored as `int` | PASS |
-| `test_user_agent_default` | `--user-agent` defaults to `deadlinkchecker/1.0` | PASS |
-| `test_user_agent_custom` | `--user-agent` stores the provided string | PASS |
-| `test_notify_email_default_is_none` | `--notify-email` defaults to `None` | PASS |
-| `test_notify_email_stores_address` | `--notify-email` stores the provided address | PASS |
+| Test                                | Description                                       | Result |
+| ----------------------------------- | ------------------------------------------------- | ------ |
+| `test_start_url_is_required`        | Omitting `start_url` raises `SystemExit`          | PASS   |
+| `test_start_url_stored`             | `start_url` positional is stored on the namespace | PASS   |
+| `test_output_default_is_none`       | `--output` defaults to `None`                     | PASS   |
+| `test_output_long_flag`             | `--output` stores the provided path               | PASS   |
+| `test_output_short_flag`            | `-o` is an alias for `--output`                   | PASS   |
+| `test_workers_default`              | `--workers` defaults to `10`                      | PASS   |
+| `test_workers_long_flag`            | `--workers` stores the given integer              | PASS   |
+| `test_workers_short_flag`           | `-w` is an alias for `--workers`                  | PASS   |
+| `test_workers_is_int`               | `--workers` value is stored as `int`              | PASS   |
+| `test_timeout_default`              | `--timeout` defaults to `10`                      | PASS   |
+| `test_timeout_long_flag`            | `--timeout` stores the given integer              | PASS   |
+| `test_timeout_short_flag`           | `-t` is an alias for `--timeout`                  | PASS   |
+| `test_timeout_is_int`               | `--timeout` value is stored as `int`              | PASS   |
+| `test_user_agent_default`           | `--user-agent` defaults to `linkprobe/1.0`        | PASS   |
+| `test_user_agent_custom`            | `--user-agent` stores the provided string         | PASS   |
+| `test_notify_email_default_is_none` | `--notify-email` defaults to `None`               | PASS   |
+| `test_notify_email_stores_address`  | `--notify-email` stores the provided address      | PASS   |
 
 #### `TestBuildEmailRows` (`tests/test_emailer.py`)
 
 Tests `emailer._build_email_rows()`.
 
-| Test | Description | Result |
-|---|---|---|
-| `test_returns_empty_string_for_empty_list` | Empty input returns empty string | PASS |
-| `test_single_row_contains_link_referrer_status` | Single result contains link, referrer, status in `<td>` elements | PASS |
-| `test_multiple_rows_joined_by_newline` | Multiple rows joined by newlines | PASS |
-| `test_html_special_chars_are_escaped` | `<script>` in link is escaped to `&lt;script&gt;` | PASS |
+| Test                                            | Description                                                      | Result |
+| ----------------------------------------------- | ---------------------------------------------------------------- | ------ |
+| `test_returns_empty_string_for_empty_list`      | Empty input returns empty string                                 | PASS   |
+| `test_single_row_contains_link_referrer_status` | Single result contains link, referrer, status in `<td>` elements | PASS   |
+| `test_multiple_rows_joined_by_newline`          | Multiple rows joined by newlines                                 | PASS   |
+| `test_html_special_chars_are_escaped`           | `<script>` in link is escaped to `&lt;script&gt;`                | PASS   |
 
 #### `TestBuildEmailHtml` (`tests/test_emailer.py`)
 
 Tests `emailer._build_email_html()`.
 
-| Test | Description | Result |
-|---|---|---|
-| `test_contains_website` | Output contains website name | PASS |
-| `test_contains_timestamp` | Output contains timestamp | PASS |
-| `test_contains_total_links_count` | Output contains total links count | PASS |
-| `test_contains_non_200_count` | Output contains non-200 count | PASS |
-| `test_no_table_when_no_non_200_results` | No `<table>` when non_200_results is empty | PASS |
-| `test_table_present_when_non_200_results_exist` | `<table>` present when non_200_results is non-empty | PASS |
-| `test_table_contains_thead_and_tbody` | Table has `<thead>` and `<tbody>` | PASS |
-| `test_website_html_special_chars_escaped` | HTML chars in website name are escaped | PASS |
+| Test                                            | Description                                         | Result |
+| ----------------------------------------------- | --------------------------------------------------- | ------ |
+| `test_contains_website`                         | Output contains website name                        | PASS   |
+| `test_contains_timestamp`                       | Output contains timestamp                           | PASS   |
+| `test_contains_total_links_count`               | Output contains total links count                   | PASS   |
+| `test_contains_non_200_count`                   | Output contains non-200 count                       | PASS   |
+| `test_no_table_when_no_non_200_results`         | No `<table>` when non_200_results is empty          | PASS   |
+| `test_table_present_when_non_200_results_exist` | `<table>` present when non_200_results is non-empty | PASS   |
+| `test_table_contains_thead_and_tbody`           | Table has `<thead>` and `<tbody>`                   | PASS   |
+| `test_website_html_special_chars_escaped`       | HTML chars in website name are escaped              | PASS   |
 
 #### `TestPostToResend` (`tests/test_emailer.py`)
 
 Tests `emailer._post_to_resend()`. All calls mock `urllib.request.urlopen`.
 
-| Test | Description | Result |
-|---|---|---|
-| `test_prints_notification_sent_on_200` | `"Notification sent."` printed to stdout on HTTP 200 | PASS |
-| `test_warns_to_stderr_on_non_200_response` | Non-200 status code emits warning to stderr | PASS |
-| `test_warns_to_stderr_on_http_error` | `HTTPError` emits warning with code to stderr | PASS |
-| `test_warns_to_stderr_on_url_error` | `URLError` emits warning with reason to stderr | PASS |
-| `test_request_uses_bearer_auth_header` | `Authorization` header is `Bearer <api_key>` | PASS |
-| `test_request_is_post_method` | HTTP method is POST | PASS |
+| Test                                       | Description                                          | Result |
+| ------------------------------------------ | ---------------------------------------------------- | ------ |
+| `test_prints_notification_sent_on_200`     | `"Notification sent."` printed to stdout on HTTP 200 | PASS   |
+| `test_warns_to_stderr_on_non_200_response` | Non-200 status code emits warning to stderr          | PASS   |
+| `test_warns_to_stderr_on_http_error`       | `HTTPError` emits warning with code to stderr        | PASS   |
+| `test_warns_to_stderr_on_url_error`        | `URLError` emits warning with reason to stderr       | PASS   |
+| `test_request_uses_bearer_auth_header`     | `Authorization` header is `Bearer <api_key>`         | PASS   |
+| `test_request_is_post_method`              | HTTP method is POST                                  | PASS   |
 
 #### `TestSendEmailNotification` (`tests/test_emailer.py`)
 
 Tests `emailer.send_email_notification()`. Module-level `_RESEND_API_KEY` and `_RESEND_FROM_ADDRESS` are patched directly via `patch.object` so tests are independent of the runtime environment.
 
-| Test | Description | Result |
-|---|---|---|
-| `test_warns_and_returns_when_api_key_missing` | `_RESEND_API_KEY is None` warns about `RESEND_API_KEY`, makes no HTTP call | PASS |
-| `test_warns_and_returns_when_from_address_missing` | `_RESEND_FROM_ADDRESS is None` warns about `RESEND_FROM_ADDRESS`, makes no HTTP call | PASS |
-| `test_warns_for_api_key_not_from_address_when_both_missing` | Both env vars absent: only the first (`RESEND_API_KEY`) warning emitted (early return) | PASS |
-| `test_only_non_200_results_included_in_email` | Only non-200 rows passed to `_build_email_html`; 200 rows filtered out | PASS |
-| `test_subject_contains_website_and_count` | Subject contains website name and non-200 count | PASS |
-| `test_post_to_resend_called_with_correct_credentials` | `_post_to_resend` receives `api_key` and `from_address` from env-var constants | PASS |
-| `test_all_200_results_sends_email_with_zero_non_200_count` | All-200 results still send email; subject contains `"0"` | PASS |
+| Test                                                        | Description                                                                            | Result |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------ |
+| `test_warns_and_returns_when_api_key_missing`               | `_RESEND_API_KEY is None` warns about `RESEND_API_KEY`, makes no HTTP call             | PASS   |
+| `test_warns_and_returns_when_from_address_missing`          | `_RESEND_FROM_ADDRESS is None` warns about `RESEND_FROM_ADDRESS`, makes no HTTP call   | PASS   |
+| `test_warns_for_api_key_not_from_address_when_both_missing` | Both env vars absent: only the first (`RESEND_API_KEY`) warning emitted (early return) | PASS   |
+| `test_only_non_200_results_included_in_email`               | Only non-200 rows passed to `_build_email_html`; 200 rows filtered out                 | PASS   |
+| `test_subject_contains_website_and_count`                   | Subject contains website name and non-200 count                                        | PASS   |
+| `test_post_to_resend_called_with_correct_credentials`       | `_post_to_resend` receives `api_key` and `from_address` from env-var constants         | PASS   |
+| `test_all_200_results_sends_email_with_zero_non_200_count`  | All-200 results still send email; subject contains `"0"`                               | PASS   |
 
 ---
 
 ### Pre-existing Tests (unchanged, all still pass)
 
-| File | Test Class | Tests | Result |
-|---|---|---|---|
-| `tests/test_checker_cli.py` | `TestCheckerCLI` | 3 | PASS |
-| `tests/test_checker_cli.py` | `TestCrawlerDiscoveredOutput` | 5 | PASS |
-| `tests/test_checker_cli.py` | `TestCheckerCheckedOutput` | 5 | PASS |
-| `tests/test_checker_cli.py` | `TestCheckerThreadSafety` | 1 | PASS |
-| `tests/test_fetcher.py` | `TestCheckUrl` | 4 | PASS |
-| `tests/test_normaliser.py` | `TestNormalise` | 8 | PASS |
-| `tests/test_parser.py` | `TestExtractLinks` | 4 | PASS |
-| `tests/test_reporter.py` | `TestWriteCsv` | 1 | PASS |
-| `tests/test_reporter.py` | `TestWriteMarkdownSummary` | 8 | PASS |
-| `tests/test_integration.py` | `TestIntegration` | 5 | PASS |
+| File                        | Test Class                    | Tests | Result |
+| --------------------------- | ----------------------------- | ----- | ------ |
+| `tests/test_checker_cli.py` | `TestCheckerCLI`              | 3     | PASS   |
+| `tests/test_checker_cli.py` | `TestCrawlerDiscoveredOutput` | 5     | PASS   |
+| `tests/test_checker_cli.py` | `TestCheckerCheckedOutput`    | 5     | PASS   |
+| `tests/test_checker_cli.py` | `TestCheckerThreadSafety`     | 1     | PASS   |
+| `tests/test_fetcher.py`     | `TestCheckUrl`                | 4     | PASS   |
+| `tests/test_normaliser.py`  | `TestNormalise`               | 8     | PASS   |
+| `tests/test_parser.py`      | `TestExtractLinks`            | 4     | PASS   |
+| `tests/test_reporter.py`    | `TestWriteCsv`                | 1     | PASS   |
+| `tests/test_reporter.py`    | `TestWriteMarkdownSummary`    | 8     | PASS   |
+| `tests/test_integration.py` | `TestIntegration`             | 5     | PASS   |
 
 ---
 
@@ -667,7 +667,7 @@ status: passed
 
 - Python: `/e/Applications/Scoop/apps/python/current/python.exe` (3.14.3)
 - Command: `python -m pytest tests/ -v`
-- Working directory: `E:/Git/GitHub/deadlinkchecker`
+- Working directory: `E:/Git/GitHub/linkprobe`
 - Date: 2026-02-25
 
 ---
@@ -691,6 +691,7 @@ status: passed
 The class was renamed to match the renamed function `_send_via_resend`. All six urllib-based tests were replaced with four SDK-based tests. The old tests mocked `emailer.urllib.request.urlopen` and called `_post_to_resend` with five arguments (including `api_key`). The new tests mock `resend.Emails.send` and call `_send_via_resend` with four arguments (no `api_key`).
 
 Tests removed (urllib concerns no longer applicable):
+
 - `test_warns_to_stderr_on_non_200_response` — SDK abstracts HTTP status; not separately observable.
 - `test_warns_to_stderr_on_http_error` — SDK-specific exception, not `urllib.error.HTTPError`.
 - `test_warns_to_stderr_on_url_error` — SDK-specific exception, not `urllib.error.URLError`.
@@ -699,53 +700,53 @@ Tests removed (urllib concerns no longer applicable):
 
 Tests added (SDK contract):
 
-| Test | Description | Result |
-|---|---|---|
-| `test_prints_notification_sent_on_success` | `"Notification sent."` printed to stdout when SDK call succeeds | PASS |
-| `test_warns_to_stderr_on_exception` | Any `Exception` from the SDK emits `"Warning"` and the message to stderr | PASS |
-| `test_sdk_called_with_correct_params` | `resend.Emails.send` receives a dict with `from`, `to`, `subject`, and `html` keys matching the call arguments | PASS |
-| `test_exception_does_not_propagate` | An `Exception` from the SDK is caught; the function returns normally (exits 0 guarantee) | PASS |
+| Test                                       | Description                                                                                                    | Result |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------- | ------ |
+| `test_prints_notification_sent_on_success` | `"Notification sent."` printed to stdout when SDK call succeeds                                                | PASS   |
+| `test_warns_to_stderr_on_exception`        | Any `Exception` from the SDK emits `"Warning"` and the message to stderr                                       | PASS   |
+| `test_sdk_called_with_correct_params`      | `resend.Emails.send` receives a dict with `from`, `to`, `subject`, and `html` keys matching the call arguments | PASS   |
+| `test_exception_does_not_propagate`        | An `Exception` from the SDK is caught; the function returns normally (exits 0 guarantee)                       | PASS   |
 
 #### `TestSendEmailNotification` — updated
 
-| Change | Old | New |
-|---|---|---|
-| "no SDK call made" assertion | `patch("emailer.urllib.request.urlopen")` + `assert_not_called()` | `patch("resend.Emails.send")` + `assert_not_called()` |
-| delegate call mock | `patch("emailer._post_to_resend")` | `patch("emailer._send_via_resend")` |
-| renamed test | `test_post_to_resend_called_with_correct_credentials` | `test_send_via_resend_called_with_correct_args` |
-| removed assertion | checked `api_key` arg passed to `_post_to_resend` | removed — `api_key` no longer passed; set via `resend.api_key` |
-| new test | — | `test_resend_api_key_set_before_send` — verifies `resend.api_key` is assigned the value of `_RESEND_API_KEY` before `_send_via_resend` is called |
+| Change                       | Old                                                               | New                                                                                                                                              |
+| ---------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| "no SDK call made" assertion | `patch("emailer.urllib.request.urlopen")` + `assert_not_called()` | `patch("resend.Emails.send")` + `assert_not_called()`                                                                                            |
+| delegate call mock           | `patch("emailer._post_to_resend")`                                | `patch("emailer._send_via_resend")`                                                                                                              |
+| renamed test                 | `test_post_to_resend_called_with_correct_credentials`             | `test_send_via_resend_called_with_correct_args`                                                                                                  |
+| removed assertion            | checked `api_key` arg passed to `_post_to_resend`                 | removed — `api_key` no longer passed; set via `resend.api_key`                                                                                   |
+| new test                     | —                                                                 | `test_resend_api_key_set_before_send` — verifies `resend.api_key` is assigned the value of `_RESEND_API_KEY` before `_send_via_resend` is called |
 
-| Test | Description | Result |
-|---|---|---|
-| `test_warns_and_returns_when_api_key_missing` | `_RESEND_API_KEY is None` → warning, no SDK call | PASS |
-| `test_warns_and_returns_when_from_address_missing` | `_RESEND_FROM_ADDRESS is None` → warning, no SDK call | PASS |
-| `test_warns_for_api_key_not_from_address_when_both_missing` | Both absent → only `RESEND_API_KEY` warning emitted (early return) | PASS |
-| `test_only_non_200_results_included_in_email` | 200 rows filtered; only non-200 rows reach `_build_email_html` | PASS |
-| `test_subject_contains_website_and_count` | Subject contains website and non-200 count | PASS |
-| `test_send_via_resend_called_with_correct_args` | `_send_via_resend` receives correct `from_address` and `notify_email` | PASS |
-| `test_resend_api_key_set_before_send` | `resend.api_key` equals `_RESEND_API_KEY` at the moment `_send_via_resend` is entered | PASS |
-| `test_all_200_results_sends_email_with_zero_non_200_count` | All-200 input still sends; subject contains `"0"` | PASS |
+| Test                                                        | Description                                                                           | Result |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------ |
+| `test_warns_and_returns_when_api_key_missing`               | `_RESEND_API_KEY is None` → warning, no SDK call                                      | PASS   |
+| `test_warns_and_returns_when_from_address_missing`          | `_RESEND_FROM_ADDRESS is None` → warning, no SDK call                                 | PASS   |
+| `test_warns_for_api_key_not_from_address_when_both_missing` | Both absent → only `RESEND_API_KEY` warning emitted (early return)                    | PASS   |
+| `test_only_non_200_results_included_in_email`               | 200 rows filtered; only non-200 rows reach `_build_email_html`                        | PASS   |
+| `test_subject_contains_website_and_count`                   | Subject contains website and non-200 count                                            | PASS   |
+| `test_send_via_resend_called_with_correct_args`             | `_send_via_resend` receives correct `from_address` and `notify_email`                 | PASS   |
+| `test_resend_api_key_set_before_send`                       | `resend.api_key` equals `_RESEND_API_KEY` at the moment `_send_via_resend` is entered | PASS   |
+| `test_all_200_results_sends_email_with_zero_non_200_count`  | All-200 input still sends; subject contains `"0"`                                     | PASS   |
 
 ---
 
 ### Pre-existing Tests (unchanged, all still pass)
 
-| File | Test Class | Tests | Result |
-|---|---|---|---|
-| `tests/test_checker_cli.py` | `TestCheckerCLI` | 3 | PASS |
-| `tests/test_checker_cli.py` | `TestCrawlerDiscoveredOutput` | 5 | PASS |
-| `tests/test_checker_cli.py` | `TestCheckerCheckedOutput` | 5 | PASS |
-| `tests/test_checker_cli.py` | `TestCheckerThreadSafety` | 1 | PASS |
-| `tests/test_checker_cli.py` | `TestBuildArgParser` | 17 | PASS |
-| `tests/test_emailer.py` | `TestBuildEmailRows` | 4 | PASS |
-| `tests/test_emailer.py` | `TestBuildEmailHtml` | 8 | PASS |
-| `tests/test_fetcher.py` | `TestCheckUrl` | 4 | PASS |
-| `tests/test_normaliser.py` | `TestNormalise` | 8 | PASS |
-| `tests/test_parser.py` | `TestExtractLinks` | 4 | PASS |
-| `tests/test_reporter.py` | `TestWriteCsv` | 1 | PASS |
-| `tests/test_reporter.py` | `TestWriteMarkdownSummary` | 8 | PASS |
-| `tests/test_integration.py` | `TestIntegration` | 5 | PASS |
+| File                        | Test Class                    | Tests | Result |
+| --------------------------- | ----------------------------- | ----- | ------ |
+| `tests/test_checker_cli.py` | `TestCheckerCLI`              | 3     | PASS   |
+| `tests/test_checker_cli.py` | `TestCrawlerDiscoveredOutput` | 5     | PASS   |
+| `tests/test_checker_cli.py` | `TestCheckerCheckedOutput`    | 5     | PASS   |
+| `tests/test_checker_cli.py` | `TestCheckerThreadSafety`     | 1     | PASS   |
+| `tests/test_checker_cli.py` | `TestBuildArgParser`          | 17    | PASS   |
+| `tests/test_emailer.py`     | `TestBuildEmailRows`          | 4     | PASS   |
+| `tests/test_emailer.py`     | `TestBuildEmailHtml`          | 8     | PASS   |
+| `tests/test_fetcher.py`     | `TestCheckUrl`                | 4     | PASS   |
+| `tests/test_normaliser.py`  | `TestNormalise`               | 8     | PASS   |
+| `tests/test_parser.py`      | `TestExtractLinks`            | 4     | PASS   |
+| `tests/test_reporter.py`    | `TestWriteCsv`                | 1     | PASS   |
+| `tests/test_reporter.py`    | `TestWriteMarkdownSummary`    | 8     | PASS   |
+| `tests/test_integration.py` | `TestIntegration`             | 5     | PASS   |
 
 ---
 

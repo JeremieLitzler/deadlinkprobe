@@ -19,7 +19,7 @@ CHECKER_PATH = os.path.join(SRC_DIR, "checker.py")
 # Integration test — live network
 # ---------------------------------------------------------------------------
 
-SAMPLE_SITE = "https://deadlinkchecker-sample-website.netlify.app"
+SAMPLE_SITE = "https://linkprobe-sample-website.netlify.app"
 
 
 class TestIntegration(unittest.TestCase):

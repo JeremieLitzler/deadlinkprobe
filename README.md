@@ -32,7 +32,7 @@ python src/checker.py <start_url> [options]
 | `--output`, `-o`  | `scans/[WEBSITE]/[TIMESTAMP]/results.csv` | Path to the output CSV file                                 |
 | `--workers`, `-w` | `10`                                      | Number of parallel threads                                  |
 | `--timeout`, `-t` | `10`                                      | Per-request timeout in seconds                              |
-| `--user-agent`    | `deadlinkchecker/1.0`                     | User-Agent header sent with every request                   |
+| `--user-agent`    | `linkprobe/1.0`                           | User-Agent header sent with every request                   |
 | `--notify-email`  | _(omitted)_                               | Recipient address for a post-scan email notification        |
 
 When `--output` is omitted, results are written to `scans/[WEBSITE]/[TIMESTAMP]/` and a `README.md` summary is produced alongside `results.csv`.
@@ -89,18 +89,18 @@ python -m pytest tests/ -v
 A sample website is available to test the tool against:
 
 ```plaintext
-https://deadlinkchecker-sample-website.netlify.app
+https://linkprobe-sample-website.netlify.app
 ```
 
 The expected output is (sorted by referrer, then link):
 
 ```csv
 link,referrer,http_status_code
-https://deadlinkchecker-sample-website.netlify.app/about/,https://deadlinkchecker-sample-website.netlify.app/,404
-https://deadlinkchecker-sample-website.netlify.app/blog,https://deadlinkchecker-sample-website.netlify.app/,200
-https://deadlinkchecker-sample-website.netlify.app/contact,https://deadlinkchecker-sample-website.netlify.app/,200
-https://iamjeremie.me/,https://deadlinkchecker-sample-website.netlify.app/contact,200
-https://iamjeremie.me/doesnt-exist,https://deadlinkchecker-sample-website.netlify.app/contact,404
+https://linkprobe-sample-website.netlify.app/about/,https://linkprobe-sample-website.netlify.app/,404
+https://linkprobe-sample-website.netlify.app/blog,https://linkprobe-sample-website.netlify.app/,200
+https://linkprobe-sample-website.netlify.app/contact,https://linkprobe-sample-website.netlify.app/,200
+https://iamjeremie.me/,https://linkprobe-sample-website.netlify.app/contact,200
+https://iamjeremie.me/doesnt-exist,https://linkprobe-sample-website.netlify.app/contact,404
 ```
 
 Notes:

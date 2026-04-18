@@ -17,7 +17,7 @@ No dependencies beyond the Python standard library. No install step needed.
 
 ```bash
 # Run the checker
-python src/checker.py <start_url> [--output results.csv] [--workers 10] [--timeout 10] [--user-agent deadlinkchecker/1.0]
+python src/checker.py <start_url> [--output results.csv] [--workers 10] [--timeout 10] [--user-agent linkprobe/1.0]
 
 # Run all tests
 python -m pytest tests/
@@ -98,12 +98,12 @@ The user never needs to run a command — just describe what they want and the p
 
 ### Agents and their prompt files
 
-| Agent         | Prompt                      | Reads                                         | Writes                    |
-| ------------- | --------------------------- | --------------------------------------------- | ------------------------- |
-| Specification | `.agents-brain/agent-1-specs.md`  | `.agents-output/0-user-requests/[timestamp-slug].md`                                                                    | `.agents-output/1-business-specifications/[timestamp-slug].md`  |
-| Coder         | `.agents-brain/agent-2-coder.md`  | `.agents-output/1-business-specifications/[timestamp-slug].md`                                                          | `.agents-output/2-technical-specifications/[timestamp-slug].md` |
-| Tester        | `.agents-brain/agent-3-tester.md` | `.agents-output/1-business-specifications/[timestamp-slug].md`, `.agents-output/2-technical-specifications/[timestamp-slug].md` | `.agents-output/3-test-results/[timestamp-slug].md`        |
-| Versioning    | `.agents-brain/agent-4-git.md`    | `.agents-output/1-business-specifications/[timestamp-slug].md`, `.agents-output/3-test-results/[timestamp-slug].md`       | git history                                                    |
+| Agent         | Prompt                            | Reads                                                                                                                           | Writes                                                          |
+| ------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Specification | `.agents-brain/agent-1-specs.md`  | `.agents-output/0-user-requests/[timestamp-slug].md`                                                                            | `.agents-output/1-business-specifications/[timestamp-slug].md`  |
+| Coder         | `.agents-brain/agent-2-coder.md`  | `.agents-output/1-business-specifications/[timestamp-slug].md`                                                                  | `.agents-output/2-technical-specifications/[timestamp-slug].md` |
+| Tester        | `.agents-brain/agent-3-tester.md` | `.agents-output/1-business-specifications/[timestamp-slug].md`, `.agents-output/2-technical-specifications/[timestamp-slug].md` | `.agents-output/3-test-results/[timestamp-slug].md`             |
+| Versioning    | `.agents-brain/agent-4-git.md`    | `.agents-output/1-business-specifications/[timestamp-slug].md`, `.agents-output/3-test-results/[timestamp-slug].md`             | git history                                                     |
 
 ### Pipeline flow
 

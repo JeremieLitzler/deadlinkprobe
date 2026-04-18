@@ -231,12 +231,12 @@
        4 +                                                                        
        5 +| File | Change |                                                       
        6 +|---|---|                                                               
-       7 +| `deadlinkchecker.sh` | Created — main CLI script implementing B       
+       7 +| `linkprobe.sh` | Created — main CLI script implementing B       
          +FS crawl, parallel status checks, and CSV output |                      
        8 +                                                                        
        9 +### Summary                                                             
       10 +                                                                        
-      11 +`deadlinkchecker.sh` implements the full dead link checker as spe       
+      11 +`linkprobe.sh` implements the full dead link checker as spe       
          +cified:                                                                 
       12 +                                                                        
       13 +- Argument parsing via `getopts` with `--no-verify-ssl` handled s       
@@ -264,7 +264,7 @@
 
 ● Code is ready. Here's the summary:
 
-  File created: deadlinkchecker.sh (355 lines)
+  File created: linkprobe.sh (355 lines)
 
   Key implementation details:
   - Full argument parsing (getopts + manual --no-verify-ssl / -h)
@@ -443,28 +443,28 @@
 
 ● Let me fetch the sample website to discover its links.
 
-● Fetch(https://deadlinkchecker-sample-website.netlify.app)
+● Fetch(https://linkprobe-sample-website.netlify.app)
   ⎿  Received 304 bytes (200 OK)
 
-● Fetch(https://deadlinkchecker-sample-website.netlify.app/about/)
+● Fetch(https://linkprobe-sample-website.netlify.app/about/)
   ⎿  Error: Request failed with status code 404
 
-● Fetch(https://deadlinkchecker-sample-website.netlify.app/contact)
+● Fetch(https://linkprobe-sample-website.netlify.app/contact)
   ⎿  Error: Sibling tool call errored
 
-● Fetch(https://deadlinkchecker-sample-website.netlify.app/blog)
+● Fetch(https://linkprobe-sample-website.netlify.app/blog)
   ⎿  Error: Sibling tool call errored
 
-● Fetch(https://deadlinkchecker-sample-website.netlify.app/contact/)
+● Fetch(https://linkprobe-sample-website.netlify.app/contact/)
   ⎿  Received 369 bytes (200 OK)
 
-● Fetch(https://deadlinkchecker-sample-website.netlify.app/blog/)
+● Fetch(https://linkprobe-sample-website.netlify.app/blog/)
   ⎿  Received 196 bytes (200 OK)
 
 ● Let me verify the actual HTTP status codes for each URL.
 
 ● Bash(curl -s -o /dev/null -w "%{http_code}" --max-time 10
-      "https://deadlinkchecker-sample-website.netlify.app/contact" && echo "" && \
+      "https://linkprobe-sample-website.netlify.app/contact" && echo "" && \
       curl -s -o /dev/null -w "%{htt…)
   ⎿  200
      200
@@ -483,7 +483,7 @@
 
 ● Update(README.md)
   ⎿  Added 12 lines, removed 2 lines
-      32  https://deadlinkchecker-sample-website.netlify.app
+      32  https://linkprobe-sample-website.netlify.app
       33  ```
       34
       35 -The expected output is:                                                 
@@ -492,15 +492,15 @@
       37  ```csv
       38 -                                                                        
       38 +link,referrer,http_status_code                                          
-      39 +https://deadlinkchecker-sample-website.netlify.app/about/,https:/       
-         +/deadlinkchecker-sample-website.netlify.app/,404                        
-      40 +https://deadlinkchecker-sample-website.netlify.app/blog,https://d       
+      39 +https://linkprobe-sample-website.netlify.app/about/,https:/       
+         +/linkprobe-sample-website.netlify.app/,404                        
+      40 +https://linkprobe-sample-website.netlify.app/blog,https://d       
          +eadlinkchecker-sample-website.netlify.app/,200                          
-      41 +https://deadlinkchecker-sample-website.netlify.app/contact,https:       
-         +//deadlinkchecker-sample-website.netlify.app/,200                       
-      42 +http://iamjeremie.me/,https://deadlinkchecker-sample-website.netl       
+      41 +https://linkprobe-sample-website.netlify.app/contact,https:       
+         +//linkprobe-sample-website.netlify.app/,200                       
+      42 +http://iamjeremie.me/,https://linkprobe-sample-website.netl       
          +ify.app/contact,301                                                     
-      43 +http://iamjeremie.me/doesnt-exist,https://deadlinkchecker-sample-       
+      43 +http://iamjeremie.me/doesnt-exist,https://linkprobe-sample-       
          +website.netlify.app/contact,301                                         
       44  ```
       45
@@ -555,8 +555,8 @@
 
 ❯ commit and push the README.md first 
 
-● Bash(git -C /e/Git/GitHub/deadlinkchecker status && git -C
-      /e/Git/GitHub/deadlinkchecker log --oneline -3)
+● Bash(git -C /e/Git/GitHub/linkprobe status && git -C
+      /e/Git/GitHub/linkprobe log --oneline -3)
   ⎿  On branch main
      Your branch is up to date with 'origin/main'.
      … +22 lines (ctrl+o to expand)
@@ -564,18 +564,18 @@
 ● We're on main with multiple modified files. I'll create a docs branch for the   
   README change only.
 
-● Bash(git -C /e/Git/GitHub/deadlinkchecker checkout -b
+● Bash(git -C /e/Git/GitHub/linkprobe checkout -b
       docs/update-readme-expected-output)
   ⎿  Switched to a new branch 'docs/update-readme-expected-output'
 
-● Bash(git -C /e/Git/GitHub/deadlinkchecker add README.md && git -C
-      /e/Git/GitHub/deadlinkchecker commit -m "docs: add expected CSV output for  
+● Bash(git -C /e/Git/GitHub/linkprobe add README.md && git -C
+      /e/Git/GitHub/linkprobe commit -m "docs: add expected CSV output for  
       sample website…)
   ⎿  [docs/update-readme-expected-output baafb92] docs: add expected CSV outp     
      ut for sample website
       1 file changed, 30 insertions(+), 13 deletions(-)
 
-● Bash(git -C /e/Git/GitHub/deadlinkchecker push -u origin
+● Bash(git -C /e/Git/GitHub/linkprobe push -u origin
       docs/update-readme-expected-output)
   ⎿  remote:
      remote: Create a pull request for 'docs/update-readme-expected-output' o     
@@ -586,15 +586,15 @@
 
 ❯ commit updates to agent prompts on the same branch 
 
-● Bash(git -C /e/Git/GitHub/deadlinkchecker add prompts/agent-0-orchestrator.md   
-      prompts/agent-4-git.md && git -C /e/Git/GitHub/deadlinkchecker commit -m    
+● Bash(git -C /e/Git/GitHub/linkprobe add prompts/agent-0-orchestrator.md   
+      prompts/agent-4-git.md && git -C /e/Git/GitHub/linkprobe commit -m    
       "docs: fix ver…)
   ⎿  [docs/update-readme-expected-output 96f8f17] docs: fix versioning agent      
      timing and tester agent timeout in pipeline
       2 files changed, 19 insertions(+), 7 deletions(-)
 
-● Bash(git -C /e/Git/GitHub/deadlinkchecker push)
-  ⎿  To https://github.com/JeremieLitzler/deadlinkchecker
+● Bash(git -C /e/Git/GitHub/linkprobe push)
+  ⎿  To https://github.com/JeremieLitzler/linkprobe
         baafb92..96f8f17  docs/update-readme-expected-output -> docs/update-r     
      eadme-expected-output
 
@@ -602,7 +602,7 @@
 
 ❯ commit settings.local.json file and push 
 
-● Bash(git -C /e/Git/GitHub/deadlinkchecker status .claude/)
+● Bash(git -C /e/Git/GitHub/linkprobe status .claude/)
   ⎿  On branch docs/update-readme-expected-output
      Your branch is up to date with 'origin/docs/update-readme-expected-outpu     
      t'.
@@ -610,8 +610,8 @@
 
 ● Read 2 files (ctrl+o to expand)
 
-● Bash(git -C /e/Git/GitHub/deadlinkchecker add .claude/settings.local.json && git
-       -C /e/Git/GitHub/deadlinkchecker commit -m "docs: add Claude Code local    
+● Bash(git -C /e/Git/GitHub/linkprobe add .claude/settings.local.json && git
+       -C /e/Git/GitHub/linkprobe commit -m "docs: add Claude Code local    
       settings wit…)
   ⎿  warning: in the working copy of '.claude/settings.local.json', LF will b     
      e replaced by CRLF the next time Git touches it
@@ -622,8 +622,8 @@
 
 ❯ go back to main and update local branch 
 
-● Bash(git -C /e/Git/GitHub/deadlinkchecker checkout main && git -C
-      /e/Git/GitHub/deadlinkchecker pull)
+● Bash(git -C /e/Git/GitHub/linkprobe checkout main && git -C
+      /e/Git/GitHub/linkprobe pull)
   ⎿  Switched to branch 'main'
      M  .agents/code-ready.md
      M  .agents/specs.md
@@ -636,23 +636,23 @@
 
 ● Let me check what needs to be cleaned up first.
 
-● Bash(git -C /e/Git/GitHub/deadlinkchecker status && ls
-      /e/Git/GitHub/deadlinkchecker/tests/ 2>/dev/null)
+● Bash(git -C /e/Git/GitHub/linkprobe status && ls
+      /e/Git/GitHub/linkprobe/tests/ 2>/dev/null)
   ⎿  On branch main
      Your branch is up to date with 'origin/main'.
      … +15 lines (ctrl+o to expand)
 
-● Bash(rm /e/Git/GitHub/deadlinkchecker/deadlinkchecker.sh
-      /e/Git/GitHub/deadlinkchecker/results.csv && rm -rf
-      /e/Git/GitHub/deadlinkchecker/tests/)
+● Bash(rm /e/Git/GitHub/linkprobe/linkprobe.sh
+      /e/Git/GitHub/linkprobe/results.csv && rm -rf
+      /e/Git/GitHub/linkprobe/tests/)
   ⎿  Done
 
-● Bash(git -C /e/Git/GitHub/deadlinkchecker restore .agents/code-ready.md
+● Bash(git -C /e/Git/GitHub/linkprobe restore .agents/code-ready.md
       .agents/specs.md .agents/user-requests.md .agents/test-results.md
       2>/dev/null; true)
   ⎿  (No output)
 
-● Bash(git -C /e/Git/GitHub/deadlinkchecker status)
+● Bash(git -C /e/Git/GitHub/linkprobe status)
   ⎿  On branch main
      Your branch is up to date with 'origin/main'.
 
@@ -808,7 +808,7 @@
   Commit: feat: add Python dead link checker CLI tool
 
   Open a PR at:
-  https://github.com/JeremieLitzler/deadlinkchecker/pull/new/feature/dead-link-che
+  https://github.com/JeremieLitzler/linkprobe/pull/new/feature/dead-link-che
   cker-python
 
 ✻ Cogitated for 54s

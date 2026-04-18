@@ -26,7 +26,7 @@
 
 ## 2026-02-24 - Bug #16: Workflow link checker cannot push scans folder
 
-- Modified `.github/workflows/deadlinkchecker.yml` — replaced bare checkout with a `data/scans`-branch checkout (`ref: data/scans`, `fetch-depth: 0`), added an "Ensure data/scans branch exists" step that creates the branch locally if the remote does not yet have it, and changed `git push` to `git push origin data/scans` so scan results are committed to the `data/scans` branch instead of `main`, bypassing the `protect-main` ruleset.
+- Modified `.github/workflows/linkprobe.yml` — replaced bare checkout with a `data/scans`-branch checkout (`ref: data/scans`, `fetch-depth: 0`), added an "Ensure data/scans branch exists" step that creates the branch locally if the remote does not yet have it, and changed `git push` to `git push origin data/scans` so scan results are committed to the `data/scans` branch instead of `main`, bypassing the `protect-main` ruleset.
 
 ## 2026-02-24 - Issue #18: Agentic Workflow updates
 
