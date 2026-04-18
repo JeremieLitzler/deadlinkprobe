@@ -1,3 +1,9 @@
+## [2.1.0](https://github.com/JeremieLitzler/linkprobe/compare/v2.0.0...v2.1.0) (2026-04-18)
+
+### Features
+
+* **website:** add promotional one-page website ([57ee673](https://github.com/JeremieLitzler/linkprobe/commit/57ee6730411c3767dfc7365e041b4c122a38b1b9))
+
 ## [2.0.0](https://github.com/JeremieLitzler/linkprobe/compare/v1.2.1...v2.0.0) (2026-04-18)
 
 ### ⚠ BREAKING CHANGES
