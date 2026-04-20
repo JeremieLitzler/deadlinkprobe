@@ -1,3 +1,17 @@
+## [2.2.0](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.1.2...v2.2.0) (2026-04-20)
+
+### Features
+
+* update <head> with meta tags [#47](https://github.com/JeremieLitzler/deadlinkprobe/issues/47) ([b819628](https://github.com/JeremieLitzler/deadlinkprobe/commit/b8196283aa6d3e4866f1c8a616bd3792c55e9158))
+
+### Bug Fixes
+
+* resolve styles generate through tailwind CLI ([#53](https://github.com/JeremieLitzler/deadlinkprobe/issues/53)) ([c076c2e](https://github.com/JeremieLitzler/deadlinkprobe/commit/c076c2e283eaee8b34513aa2ed0273d0ec2065ae))
+
+### Others
+
+* extract static CSS ([#53](https://github.com/JeremieLitzler/deadlinkprobe/issues/53)) ([b30c8ff](https://github.com/JeremieLitzler/deadlinkprobe/commit/b30c8ff3fc0db5bdaeb3d93263e84374b7dad726))
+
 ## [2.1.2](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.1.1...v2.1.2) (2026-04-20)
 
 ### Bug Fixes
