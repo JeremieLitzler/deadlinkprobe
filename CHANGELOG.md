@@ -1,3 +1,9 @@
+## [2.1.2](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.1.1...v2.1.2) (2026-04-20)
+
+### Bug Fixes
+
+* add missing modifications from [#50](https://github.com/JeremieLitzler/deadlinkprobe/issues/50) ([a692c06](https://github.com/JeremieLitzler/deadlinkprobe/commit/a692c06b18a87736b3450f8c8e77b1d355d9fc2b))
+
 ## [2.1.1](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.1.0...v2.1.1) (2026-04-20)
 
 ### Bug Fixes
