@@ -1,3 +1,9 @@
+## [2.2.2](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.2.1...v2.2.2) (2026-04-20)
+
+### Bug Fixes
+
+* update license to match actual license file ([7d8aa49](https://github.com/JeremieLitzler/deadlinkprobe/commit/7d8aa490c87662304b86eace58f0a1bec6f8b94c))
+
 ## [2.2.1](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.2.0...v2.2.1) (2026-04-20)
 
 ### Bug Fixes
