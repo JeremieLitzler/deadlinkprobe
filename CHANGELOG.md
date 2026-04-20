@@ -1,3 +1,9 @@
+## [2.1.1](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.1.0...v2.1.1) (2026-04-20)
+
+### Bug Fixes
+
+* final rename of app ([#50](https://github.com/JeremieLitzler/deadlinkprobe/issues/50)) ([7d3dba7](https://github.com/JeremieLitzler/deadlinkprobe/commit/7d3dba756d12fe054fcbc9b83666179d85dd6b03))
+
 ## [2.1.0](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.0.0...v2.1.0) (2026-04-18)
 
 ### Features
