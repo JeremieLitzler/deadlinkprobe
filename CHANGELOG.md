@@ -1,3 +1,9 @@
+## [2.3.4](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.3.3...v2.3.4) (2026-04-28)
+
+### Bug Fixes
+
+* control deploy post release ([#67](https://github.com/JeremieLitzler/deadlinkprobe/issues/67)) ([8a0ad26](https://github.com/JeremieLitzler/deadlinkprobe/commit/8a0ad26ef39c35c9369e5ec3de9ae0e7018c510e))
+
 ## [2.3.3](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.3.2...v2.3.3) (2026-04-28)
 
 ### Bug Fixes
