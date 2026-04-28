@@ -1,3 +1,9 @@
+## [2.3.2](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.3.1...v2.3.2) (2026-04-28)
+
+### Bug Fixes
+
+* resolve issue on git add command ([#62](https://github.com/JeremieLitzler/deadlinkprobe/issues/62)) ([567ccf1](https://github.com/JeremieLitzler/deadlinkprobe/commit/567ccf15eb2fe50dc96202dd29220400b824090f))
+
 ## [2.3.1](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.3.0...v2.3.1) (2026-04-28)
 
 ### Bug Fixes
