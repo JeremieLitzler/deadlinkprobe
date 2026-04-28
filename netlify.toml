@@ -1,0 +1,4 @@
+[build]
+  command = "echo 'Building site'"
+  publish = "."
+  ignore = "git log -1 --format='%s' | grep -v '\\[deploy\\]'"

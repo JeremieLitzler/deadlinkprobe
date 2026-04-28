@@ -63,5 +63,9 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add website/index.html
           # `[skip ci]` in the commit message prevents an infinite loop of triggered workflows.
-          git commit -m "chore: update website/index.html version to ${{ steps.semantic.outputs.new_release_version }} [skip ci]"
+          git commit -m "chore: update website/index.html version to ${{ steps.semantic.outputs.new_release_version }} [skip ci] [deploy]"
           git push https://x-access-token:${{ steps.generate_token.outputs.token }}@github.com/${{ github.repository }}.git HEAD:main
+
+      - name: Trigger Netlify deploy
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: curl -X POST -d {} "${{ secrets.NETLIFY_BUILD_HOOK }}"
