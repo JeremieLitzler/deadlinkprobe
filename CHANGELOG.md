@@ -1,3 +1,9 @@
+## [2.3.5](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.3.4...v2.3.5) (2026-04-29)
+
+### Bug Fixes
+
+* replace MIT with GPL-3.0 ([fc9ebb1](https://github.com/JeremieLitzler/deadlinkprobe/commit/fc9ebb1efdd4c033f1597c2feb1f8ac8a949a300))
+
 ## [2.3.4](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.3.3...v2.3.4) (2026-04-28)
 
 ### Bug Fixes
