@@ -1,3 +1,9 @@
+## [2.3.6](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.3.5...v2.3.6) (2026-04-30)
+
+### Bug Fixes
+
+* update index.html to add a "..." in example ([dec4212](https://github.com/JeremieLitzler/deadlinkprobe/commit/dec421245551132b2f9aca4b29586b3e83f53d09))
+
 ## [2.3.5](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.3.4...v2.3.5) (2026-04-29)
 
 ### Bug Fixes
