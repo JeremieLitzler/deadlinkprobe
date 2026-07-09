@@ -13,7 +13,9 @@ Tools are NOT on the default PATH and `export PATH=...` does not work in this sh
 
 ## Commands
 
-No dependencies beyond the Python standard library. No install step needed.
+Runtime code needs only the Python standard library plus `resend` (`requirements.txt`). The
+`jli-` command chain's review and test steps additionally use `ruff`, `mypy`, and `pytest`,
+pinned in `requirements-dev.txt` (`pip install -r requirements-dev.txt`).
 
 ```bash
 # Run the checker
@@ -27,6 +29,10 @@ python -m pytest tests/test_fetcher.py
 
 # Run a single test by name
 python -m pytest tests/test_fetcher.py::TestCheckUrl::test_head_success
+
+# Lint + type-check (jli-reviews-code runs these)
+ruff check src tests
+mypy src
 ```
 
 Tests also work with the standard library runner: `python -m unittest tests/test_fetcher.py`.
@@ -87,46 +93,40 @@ A dead link checker CLI tool. Given a starting URL:
 4. Output results as CSV: `link, referrer, http_status_code`.
 5. Use parallel requests for performance.
 
-## Multi-Agent Pipeline
+## Feature Workflow — the `jli-` command chain
 
-**When the user provides a feature request or bug fix, act as the orchestrator:**
+The supported way to build a feature or fix is the **manual `jli-` slash-command chain** in
+`.claude/commands/`. Each command is one stateless step the human runs by hand; state flows
+through a task folder `docs/tasks/issue-<id>-<slug>/` in the feature worktree. Full reference:
+`AGENT-COMMAND-MIGRATION.md` (mapping table, chain diagram, pipeline scripts).
 
-1. Save the request to `.agents-output/0-user-requests/[timestamp-slug].md`.
-2. Follow the pipeline in `.agents-brain/agent-0-orchestrator.md` step by step.
+Worktree layout (bare repo with sibling worktrees):
 
-The user never needs to run a command — just describe what they want and the pipeline starts.
-
-### Agents and their prompt files
-
-| Agent         | Prompt                            | Reads                                                                                                                           | Writes                                                          |
-| ------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| Specification | `.agents-brain/agent-1-specs.md`  | `.agents-output/0-user-requests/[timestamp-slug].md`                                                                            | `.agents-output/1-business-specifications/[timestamp-slug].md`  |
-| Coder         | `.agents-brain/agent-2-coder.md`  | `.agents-output/1-business-specifications/[timestamp-slug].md`                                                                  | `.agents-output/2-technical-specifications/[timestamp-slug].md` |
-| Tester        | `.agents-brain/agent-3-tester.md` | `.agents-output/1-business-specifications/[timestamp-slug].md`, `.agents-output/2-technical-specifications/[timestamp-slug].md` | `.agents-output/3-test-results/[timestamp-slug].md`             |
-| Versioning    | `.agents-brain/agent-4-git.md`    | `.agents-output/1-business-specifications/[timestamp-slug].md`, `.agents-output/3-test-results/[timestamp-slug].md`             | git history                                                     |
-
-### Pipeline flow
-
-```
-[0-user-requests/[timestamp-slug].md]
-       ↓
-Versioning agent → branch
-       ↓
-  Specs agent → 1-business-specifications/[timestamp-slug].md
-       ↓
-Versioning agent → commit specs
-       ↓ ← human approval
-  Coder agent → 2-technical-specifications/[timestamp-slug].md
-       ↓           ↑ status: review specs (loops back)
-       ↓
-Versioning agent → commit code
-       ↓ ← human approval
- Tester agent → 3-test-results/[timestamp-slug].md
-       ↓           ↑ status: failed (loops back to coder)
-Versioning agent → commit tests + push
+```plaintext
+E:/Git/GitHub/deadlinkprobe.git             bare repo
+E:/Git/GitHub/deadlinkprobe_main            main worktree (chain home)
+E:/Git/GitHub/deadlinkprobe_<type>-<slug>   a feature worktree
 ```
 
-Human approval gates pause the pipeline after specs and after coding. The orchestrator retries failed loops up to 3 times before aborting.
+`/jli-sets-up` and `/jli-cleans` run from the `deadlinkprobe_main` worktree; every phase
+command runs from inside the feature worktree opened with `code <worktree>`. The order:
+
+```plaintext
+/jli-sets-up  >  /jli-writes-spec  >  /jli-verifies-security  >  /jli-writes-tests-spec
+   >  /jli-codes  >  /jli-reviews-code  >  /jli-writes-tests  >  /jli-runs-tests
+   >  /jli-ships  >  /jli-cleans
+```
+
+Run `/jli-commits` after each phase. Loop-backs: review "changes requested" and test "failed"
+return to `/jli-codes`; `/jli-codes` "review specs" returns to `/jli-writes-spec`. Approval
+gates: ADR warnings after spec/code, and PR-open + merge confirmations in `/jli-ships`. Edit
+the chain itself only through `/jli-tweaks-command-chain`.
+
+### Deprecated: orchestrator pipeline
+
+The older orchestrator flow under `.agents-brain/` (agent-0 … agent-4, writing to
+`.agents-output/`) is **deprecated** — superseded by the `jli-` chain and kept only for
+history. Do not start new work through it.
 
 ## Key Design Constraints
 
