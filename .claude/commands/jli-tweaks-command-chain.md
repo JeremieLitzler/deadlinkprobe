@@ -15,8 +15,8 @@ run the chain, or touch the deprecated pipeline.
   diagram, state model) at the project root
 
 It must NOT edit: source code under `src/`, test files under `tests/`, other files under
-`docs/`, the deprecated agents under `.agents-brain/`, or `CLAUDE.md`. Issues with the
-deprecated agents or `CLAUDE.md` are maintained separately (see `AGENT-COMMAND-MIGRATION.md`).
+`docs/`, or `CLAUDE.md`. `CLAUDE.md` is maintained separately (see
+`AGENT-COMMAND-MIGRATION.md`).
 
 ## Workflow
 
@@ -46,9 +46,9 @@ List every affected file before editing.
 Apply the smallest change that satisfies the request. After editing, every `jli-*.md`
 command must still hold ALL of these invariants:
 
-1. **Self-contained** — no reference to any `.agents-brain/agent-*.md` file and **no
+1. **Self-contained** — no reference to any removed orchestrator agent file and **no
    orchestrator vocabulary** ("orchestrator", "the orchestrator passes", "notify/report to
-   the orchestrator"). The chain and the deprecated pipeline must share no text.
+   the orchestrator").
 2. **Argument guard** — opens by requiring its argument and printing a usage line when empty.
    The argument is the task folder as a `@`-mention relative to the worktree
    (`@docs/tasks/issue-<id>-<slug>`) for the phase/commit/ship commands;
