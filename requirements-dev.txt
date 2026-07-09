@@ -1,0 +1,6 @@
+# Dev tooling for the jli- command chain (review + test steps).
+# Runtime deps live in requirements.txt.
+-r requirements.txt
+pytest
+ruff
+mypy
