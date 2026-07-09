@@ -117,8 +117,8 @@ security notes and test cases, implement, review, test, ship. See
 [`AGENT-COMMAND-MIGRATION.md`](AGENT-COMMAND-MIGRATION.md) for the full chain, diagram, and
 mapping.
 
-The older orchestrator-driven multi-agent pipeline under `.agents-brain/` is **deprecated**
-and kept only for history.
+The older orchestrator-driven multi-agent pipeline has been **removed**, superseded by the
+`jli-` chain.
 
 ### Pipeline artifacts
 

@@ -1,9 +1,9 @@
 # Agent-to-Command Migration
 
-This document describes how the orchestrator-driven multi-agent pipeline (the `.agents-brain/`
-agents) was migrated into a **manually-chained set of `jli-` slash commands**. The new
-commands are the supported way to develop a feature; the old orchestrator flow (driven from
-the main conversation via `.agents-brain/agent-0-orchestrator.md`) is deprecated.
+This document describes how the orchestrator-driven multi-agent pipeline (formerly the
+`.agents-brain/` agents, since removed) was migrated into a **manually-chained set of `jli-`
+slash commands**. The commands are now the only supported way to develop a feature; the old
+orchestrator flow (once driven from the main conversation via `agent-0-orchestrator`) is gone.
 
 ## Why
 
@@ -176,11 +176,11 @@ hints:
   `.claude/commands/jli-*.md` files, the `scripts/pipeline/*.sh` scripts, and this document.
   It preserves the chain invariants (self-containment, argument guard, run location,
   status-line contract, Next hint) and keeps the diagram/mapping here in sync.
-- The **deprecated** orchestrator-era agents under `.agents-brain/` and the `CLAUDE.md`
-  instructions are maintained by hand, outside this chain.
+- `CLAUDE.md` (project guidance) is maintained by hand, outside this chain.
 
 ## Deprecated
 
-- The `.agents-brain/` orchestrator flow (`agent-0-orchestrator` … `agent-4-git`) is
-  superseded by the `jli-` chain. It remains only for history; new features go through the
-  commands.
+- The `.agents-brain/` orchestrator flow (`agent-0-orchestrator` … `agent-4-git`) has been
+  **removed**, superseded by the `jli-` chain. The "Replaces (agent)" column above is kept
+  only as a historical record of what each command took over. Its `.agents-output/` artifacts
+  were migrated into per-issue folders under `docs/tasks/`.

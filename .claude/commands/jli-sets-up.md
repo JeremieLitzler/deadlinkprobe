@@ -50,7 +50,7 @@ Do NOT create the task folder before the worktree path is confirmed.
 
 ## Commit rules reference (used by every git step in this chain)
 
-- Changes to `.agents-brain`, `CLAUDE.md`, or `.claude/settings.local.json` > `ci(agent): …`
+- Changes to `CLAUDE.md` or `.claude/settings.local.json` > `ci(agent): …`
 - Changes to `.claude/commands/jli-*.md` > `ci(commands): …`
 - Changes under `docs/` > `docs: …` (pipeline artifacts use the scoped types below)
 - Changes under `.github/workflows` > `ci: …`

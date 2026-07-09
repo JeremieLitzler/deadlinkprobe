@@ -33,7 +33,7 @@ Stage and commit the changed files with the message that matches them:
 | `test-results.md` | `test: record test results for <short desc> (#[id])` |
 
 General conventional-commit rules: subject in imperative mood, lowercase, no period,
-≤72 chars; put overflow in the body. Other file classes: `.agents-brain`, `CLAUDE.md`, or
+≤72 chars; put overflow in the body. Other file classes: `CLAUDE.md` or
 `.claude/settings.local.json` > `ci(agent): …`; `.claude/commands/jli-*.md`
 > `ci(commands): …`; other `docs/` files > `docs: …`; `.github/workflows` > `ci: …`.
 
