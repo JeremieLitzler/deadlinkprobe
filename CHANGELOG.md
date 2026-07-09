@@ -1,3 +1,9 @@
+## [2.3.7](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.3.6...v2.3.7) (2026-07-09)
+
+### Others
+
+* **docs:** migrate .agents-output to docs/tasks per-issue folders ([7e65c4b](https://github.com/JeremieLitzler/deadlinkprobe/commit/7e65c4bf0190313306dac8cae84a253a6734c913))
+
 ## [2.3.6](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.3.5...v2.3.6) (2026-04-30)
 
 ### Bug Fixes
