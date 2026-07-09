@@ -111,25 +111,28 @@ Notes:
 
 ## Development
 
-This project uses a multi-agent pipeline powered by Claude Code. Describe a feature request or bug fix and the orchestrator coordinates specialist agents automatically.
+This project is built through the manual `jli-` slash-command chain in `.claude/commands/`
+(run under Claude Code). Each command is one step — set up a worktree, write the spec,
+security notes and test cases, implement, review, test, ship. See
+[`AGENT-COMMAND-MIGRATION.md`](AGENT-COMMAND-MIGRATION.md) for the full chain, diagram, and
+mapping.
 
-| Agent         | Role                                        |
-| ------------- | ------------------------------------------- |
-| Specification | Writes detailed specs from the user request |
-| Coder         | Implements the feature based on specs       |
-| Tester        | Validates the implementation with tests     |
-| Versioning    | Commits to a Git Flow branch and pushes     |
-
-Human approval gates pause the pipeline after specs and after coding.
+The older orchestrator-driven multi-agent pipeline under `.agents-brain/` is **deprecated**
+and kept only for history.
 
 ### Pipeline artifacts
 
+Each feature's artifacts live in one folder per issue under `docs/tasks/`:
+
 ```plaintext
-.agents-output/
-├── 0-user-requests/          # your input
-├── 1-business-specifications/ # specification output
-├── 2-technical-specifications/ # coder output
-└── 3-test-results/           # test output
+docs/tasks/issue-<id>-<slug>/
+├── README.md                     # the feature request / issue body (your input)
+├── business-specifications.md    # spec output
+├── security-guidelines.md        # security output
+├── test-cases.md                 # plain-language test scenarios
+├── technical-specifications.md   # implementation notes
+├── review-results.md             # code-review output
+└── test-results.md               # test-run output
 ```
 
 ### Branch naming
