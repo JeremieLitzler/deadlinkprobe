@@ -124,9 +124,10 @@ the chain itself only through `/jli-tweaks-command-chain`.
 
 ### Deprecated: orchestrator pipeline
 
-The older orchestrator flow under `.agents-brain/` (agent-0 … agent-4, writing to
-`.agents-output/`) is **deprecated** — superseded by the `jli-` chain and kept only for
-history. Do not start new work through it.
+The older orchestrator flow under `.agents-brain/` (agent-0 … agent-4) is **deprecated** —
+superseded by the `jli-` chain and kept only for history. Its former `.agents-output/`
+artifacts were migrated into per-issue folders under `docs/tasks/`. Do not start new work
+through it.
 
 ## Key Design Constraints
 
