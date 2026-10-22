@@ -7,7 +7,7 @@ name: release
 # release/*, and does not start until the test suite is green. The version is
 # left to the commits: no level is forced.
 # Deploy site: after a release is cut, and on a manual dispatch with
-# "deploy-site", the Netlify build hook redeploys the website. It is a job of
+# "deploy-site" (from main only), the Netlify build hook redeploys the website. It is a job of
 # its own, so a Netlify outage never turns a published release red.
 on:
   push:
@@ -102,8 +102,10 @@ jobs:
   test:
     needs: guard
     runs-on: ubuntu-latest
+    environment: CI
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
 
@@ -215,7 +217,7 @@ jobs:
     if: >-
       always() && (
         (needs.publish.result == 'success' && needs.publish.outputs.released == 'yes') ||
-        (github.event_name == 'workflow_dispatch' && inputs.action == 'deploy-site')
+        (github.event_name == 'workflow_dispatch' && inputs.action == 'deploy-site' && github.ref == 'refs/heads/main')
       )
     runs-on: ubuntu-latest
     # NETLIFY_BUILD_HOOK is an environment secret, not a repository one.
