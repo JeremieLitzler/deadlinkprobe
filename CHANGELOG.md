@@ -1,3 +1,9 @@
+## [2.4.0](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.3.7...v2.4.0) (2026-10-22)
+
+### Features
+
+* **website:** fill version from latest GitHub release ([ade53c5](https://github.com/JeremieLitzler/deadlinkprobe/commit/ade53c5dd7bfe2d386004c1a57a3d6494a46527b)), closes [#74](https://github.com/JeremieLitzler/deadlinkprobe/issues/74)
+
 ## [2.3.7](https://github.com/JeremieLitzler/deadlinkprobe/compare/v2.3.6...v2.3.7) (2026-07-09)
 
 ### Others
