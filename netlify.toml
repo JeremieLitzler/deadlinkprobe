@@ -1,4 +1,6 @@
 [build]
   command = "echo 'Building site'"
   publish = "."
-  ignore = "if [ \"$BRANCH\" = \"main\" ]; then git log -1 --format='%s' | grep -qv '\\[deploy\\]'; else exit 1; fi"
+  # Build only when triggered by the release build hook (INCOMING_HOOK_TITLE is set); skip pushes and deploy previews.
+  # https://docs.netlify.com/build/configure-builds/ignore-builds
+  ignore = "test -z \"$INCOMING_HOOK_TITLE\""
